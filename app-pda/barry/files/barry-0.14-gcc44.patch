@@ -1,0 +1,22 @@
+diff -urN barry-0.14-orig/src/base64.cc barry-0.14/src/base64.cc
+--- barry-0.14-orig/src/base64.cc	2009-07-28 22:49:21.241624532 -0500
++++ barry-0.14/src/base64.cc	2009-07-28 22:50:35.035631935 -0500
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "base64.h"
++#include <cstdio>
+ #include <string>
+ #include <iterator>
+ 
+diff -urN barry-0.14-orig/src/record.cc barry-0.14/src/record.cc
+--- barry-0.14-orig/src/record.cc	2009-07-28 22:49:21.371622646 -0500
++++ barry-0.14/src/record.cc	2009-07-28 22:50:20.654621389 -0500
+@@ -32,6 +32,7 @@
+ #include "time.h"
+ #include "error.h"
+ #include "endian.h"
++#include <cstdio>
+ #include <sstream>
+ #include <iomanip>
+ #include <time.h>

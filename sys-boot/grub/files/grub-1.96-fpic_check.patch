@@ -1,0 +1,51 @@
+--- aclocal.m4.zorry	2008-02-03 14:11:28.000000000 +0100
++++ aclocal.m4	2009-08-22 01:05:56.000000000 +0200
+@@ -362,3 +362,31 @@
+   AC_MSG_RESULT([no])
+ [fi]
+ ])
++
++dnl Check if the C compiler supports `-fPIE'.
++AC_DEFUN(grub_CHECK_PIE,[
++[# Position independent executable.
++pie_possible=yes]
++AC_MSG_CHECKING([whether `$CC' has `-fPIE' as default])
++# Is this a reliable test case?
++AC_LANG_CONFTEST([[
++#ifdef __PIE__
++int main() {
++	return 0;
++}
++#else
++#error NO __PIE__ DEFINED
++#endif
++]])
++
++[# `$CC -c -o ...' might not be portable.  But, oh, well...  Is calling
++# `ac_compile' like this correct, after all?
++if eval "$ac_compile -S -o conftest.s" 2> /dev/null; then]
++  AC_MSG_RESULT([yes])
++  [# Should we clear up other files as well, having called `AC_LANG_CONFTEST'?
++  rm -f conftest.s
++else
++  pie_possible=no]
++  AC_MSG_RESULT([no])
++[fi]
++])
+--- configure.ac.zorry	2008-02-03 14:41:51.000000000 +0100
++++ configure.ac	2009-08-22 00:28:58.000000000 +0200
+@@ -251,6 +251,14 @@
+ # Compiler features.
+ #
+ 
++# Position independent executable.
++grub_CHECK_PIE
++[# Need that, because some distributions ship compilers that include
++# `-fPIE' in the default specs.
++if [ x"$pie_possible" = xyes ]; then
++  TARGET_CFLAGS=$TARGET_CFLAGS\ -nopie
++fi]
++
+ # Smashing stack protector.
+ grub_CHECK_STACK_PROTECTOR
+ [# Need that, because some distributions ship compilers that include

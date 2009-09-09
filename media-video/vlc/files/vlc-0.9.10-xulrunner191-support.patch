@@ -1,0 +1,26 @@
+Enable the checks to actually work with xulrunner-1.9.1.x series which upstream
+never enabled.
+
+--- configure.ac~	2009-08-20 23:37:39.052828677 -0500
++++ configure.ac	2009-08-20 23:39:01.608828817 -0500
+@@ -5534,6 +5534,7 @@
+     AS_IF( [test $found = 1],[
+         CPPFLAGS="${CPPFLAGS_save} ${MOZILLA_CFLAGS}"
+         MOZILLA_REQUIRED_HEADERS=1
++        AC_CHECK_HEADERS([npfunctions.h])
+         AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
+         AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
+           [#if HAVE_NPAPI_H
+
+--- config.h.in~	2009-08-20 23:37:47.795805490 -0500
++++ config.h.in	2009-08-20 23:39:37.015805699 -0500
+@@ -541,6 +541,9 @@
+ /* Define to 1 if you have the <npapi.h> header file. */
+ #undef HAVE_NPAPI_H
+ 
++/* Define to 1 if you have the <npfunctions.h> header file. */
++#undef HAVE_NPFUNCTIONS_H
++
+ /* Define to 1 if you have the <npruntime.h> header file. */
+ #undef HAVE_NPRUNTIME_H
+
