@@ -17,7 +17,7 @@ SRC_URI="http://www.sqlite.org/${P}.tar.gz
 LICENSE="as-is"
 SLOT="3"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~sparc-fbsd ~x86 ~x86-fbsd"
-IUSE="debug doc icu +readline soundex tcl +threadsafe"
+IUSE="debug doc +fts3 icu +readline soundex tcl +threadsafe"
 RESTRICT="!tcl? ( test )"
 
 RDEPEND="icu? ( dev-libs/icu )
@@ -49,7 +49,7 @@ src_prepare() {
 
 src_configure() {
 	# Support column metadata, bug #266651
-	append-cppflags -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_ENABLE_FTS3=1
+	append-cppflags -DSQLITE_ENABLE_COLUMN_METADATA
 
 	# Support R-trees, bug #257646
 	# Avoid "./.libs/libsqlite3.so: undefined reference to `sqlite3RtreeInit'" during non-amalgamation building.
@@ -64,6 +64,9 @@ src_configure() {
 
 	# Support soundex, bug #143794
 	use soundex && append-cppflags -DSQLITE_SOUNDEX
+
+	# http://bugs.gentoo.org/show_bug.cgi?id=207701
+	use fts3 && append-cppflags -DSQLITE_ENABLE_FTS3=1
 
 	econf \
 		$(use_enable debug) \
