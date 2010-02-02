@@ -1,18 +1,19 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-video/vlc/vlc-1.0.4.ebuild,v 1.8 2010/01/23 10:57:19 aballier Exp $
+# $Header: /var/cvsroot/gentoo-x86/media-video/vlc/vlc-1.0.5.ebuild,v 1.1 2010/01/31 15:29:06 aballier Exp $
 
 EAPI="2"
 
 SCM=""
 if [ "${PV%9999}" != "${PV}" ] ; then
 	SCM=git
-	EGIT_REPO_URI="git://git.videolan.org/vlc.git"
 	EGIT_BOOTSTRAP="bootstrap"
+	EGIT_BRANCH=master
+	EGIT_PROJECT=${P}
 	if [ "${PV%.9999}" != "${PV}" ] ; then
-		EGIT_BRANCH=${PV%.9999}-bugfix
+		EGIT_REPO_URI="git://git.videolan.org/vlc/vlc-${PV%.9999}.git"
 	else
-		EGIT_BRANCH=master
+		EGIT_REPO_URI="git://git.videolan.org/vlc.git"
 	fi
 fi
 
@@ -45,7 +46,7 @@ SRC_URI="${SRC_URI}
 LICENSE="GPL-2"
 SLOT="0"
 
-KEYWORDS="~alpha amd64 ~arm ppc ppc64 ~sparc x86 ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~ppc ~ppc64 ~sparc ~x86 ~x86-fbsd"
 IUSE="a52 aac aalib alsa altivec atmo avahi bidi cdda cddax cddb cdio dbus dc1394
 	debug dirac directfb dts dvb dvd elibc_glibc fbcon fluidsynth +ffmpeg flac fontconfig
 	+gcrypt ggi gnome gnutls hal httpd id3tag ieee1394 jack kate libass libcaca
@@ -231,7 +232,7 @@ src_prepare() {
 
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}/patches"
 	if has_version '>=net-libs/xulrunner-1.9.2' ; then
-		epatch "${FILESDIR}/vlc-1.0.4-new-xulrunner.patch"
+		epatch "${FILESDIR}/${PN}-1.0.4-xulrunner-192.patch"
 	fi
 	AT_M4DIR="m4 ${WORKDIR}/${PN}-m4" eautoreconf
 }
