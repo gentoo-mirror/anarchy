@@ -1,0 +1,45 @@
+# Copyright 1999-2010 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+ETYPE="sources"
+K_WANT_GENPATCHES="base extras"
+K_GENPATCHES_VER="3"
+
+inherit kernel-2
+detect_version
+
+GRSEC_VERSION="2.1.14-2.6.33.3-201005012055"
+GRSEC_PATCH="grsecurity-${GRSEC_VERSION}.patch"
+GRSEC_URI="http://grsecurity.com/test/${GRSEC_PATCH}"
+SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI} ${GRSEC_URI}"
+
+UNIPATCH_STRICTORDER="y"
+UNIPATCH_LIST="${DISTDIR}/${GRSEC_PATCH}"
+UNIPATCH_EXCLUDE="*_fbcondecor-0.9.6.patch"
+
+DESCRIPTION="Hardened kernel sources (kernel series ${KV_MAJOR}.${KV_MINOR})"
+HOMEPAGE="http://www.grsecurity.com"
+IUSE=""
+
+KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+
+pkg_postinst() {
+	kernel-2_pkg_postinst
+
+	local GRADM_COMPAT="sys-apps/gradm-2.1.14*"
+
+	ewarn
+	ewarn "As of ${CATEGORY}/${PN}-2.6.33-r2 the predefined"
+	ewarn "have been removed, this ensure we are actually using"
+	ewarn "the same sources that upstream expects unmodified."
+	ewarn
+	ewarn "Users of grsecurity's RBAC system must ensure they are using"
+	ewarn "${GRADM_COMPAT}, which is compatible with kernel series ${OKV}."
+	ewarn "Therefore, it is strongly recommended that the following command is"
+	ewarn "issued prior to booting a ${P} series kernel for"
+	ewarn "the first time:"
+	ewarn
+	ewarn "emerge -na =${GRADM_COMPAT}"
+	ewarn
+}
