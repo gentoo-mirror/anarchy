@@ -15,7 +15,7 @@ SRC_URI="http://hal.freedesktop.org/releases/${MY_PN}-${PV}.tar.gz"
 
 LICENSE="GPL-2 LGPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 ~x86"
 IUSE="debug doc test"
 
 RDEPEND=">=dev-libs/glib-2.21.5
@@ -49,8 +49,6 @@ function check_battery() {
 }
 
 pkg_setup() {
-	append-flags -fno-PIE
-
 	# Pedantic is currently broken
 	G2CONF="${G2CONF}
 		--localstatedir=/var
@@ -77,4 +75,6 @@ src_prepare() {
 	# bug 289873.
 	sed 's:WARNINGFLAGS_C=\"$WARNINGFLAGS_C -Wtype-limits\"::g' -i configure.ac configure \
 		|| die "sed 2 failed"
+
+	epatch "${FILESDIR}/${PN}-014-hardened-fixup.patch"
 }
