@@ -9,9 +9,9 @@ K_GENPATCHES_VER="3"
 inherit kernel-2
 detect_version
 
-GRSEC_VERSION="2.1.14-2.6.33.3-201005012055"
+GRSEC_VERSION="2.2.0-2.6.34-201007030958"
 GRSEC_PATCH="grsecurity-${GRSEC_VERSION}.patch"
-GRSEC_URI="http://grsecurity.com/test/${GRSEC_PATCH}"
+GRSEC_URI="http://dev.gentoo.org/~anarchy/grsecurity/${GRSEC_PATCH}"
 SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI} ${GRSEC_URI}"
 
 UNIPATCH_STRICTORDER="y"
@@ -27,7 +27,7 @@ KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 pkg_postinst() {
 	kernel-2_pkg_postinst
 
-	local GRADM_COMPAT="sys-apps/gradm-2.1.14*"
+	local GRADM_COMPAT="sys-apps/gradm-2.2.0*"
 
 	ewarn
 	ewarn "As of ${CATEGORY}/${PN}-2.6.33-r2 the predefined"
