@@ -4,12 +4,12 @@
 
 ETYPE="sources"
 K_WANT_GENPATCHES="base extras"
-K_GENPATCHES_VER="3"
+K_GENPATCHES_VER="4"
 
 inherit kernel-2
 detect_version
 
-GRSEC_VERSION="2.2.0-2.6.34-201007031911"
+GRSEC_VERSION="2.2.0-2.6.34.1-201007101507"
 GRSEC_PATCH="grsecurity-${GRSEC_VERSION}.patch"
 GRSEC_URI="http://dev.gentoo.org/~anarchy/grsecurity/${GRSEC_PATCH}"
 SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI} ${GRSEC_URI}"
