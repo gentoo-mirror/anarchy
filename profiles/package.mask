@@ -1,0 +1,2 @@
+# Causes apps like openoffice to fail patching.
+=sys-devel/patch-2.6.1.85
