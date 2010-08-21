@@ -4,19 +4,19 @@
 
 ETYPE="sources"
 K_WANT_GENPATCHES="base extras"
-K_GENPATCHES_VER="5"
+K_GENPATCHES_VER="8"
 
 inherit kernel-2
 detect_version
 
-GRSEC_VERSION="2.2.0-2.6.34.1-201007162107"
+GRSEC_VERSION="2.2.0-2.6.34.4-201008131840"
 GRSEC_PATCH="grsecurity-${GRSEC_VERSION}.patch"
 GRSEC_URI="http://dev.gentoo.org/~anarchy/grsecurity/${GRSEC_PATCH}"
 SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI} ${GRSEC_URI}"
 
 UNIPATCH_STRICTORDER="y"
 UNIPATCH_LIST="${DISTDIR}/${GRSEC_PATCH}"
-UNIPATCH_EXCLUDE="*_fbcondecor-0.9.6.patch"
+UNIPATCH_EXCLUDE="*_fbcondecor-0.9.6.patch *_page-table-unmap-for-stack-guard-fix.patch"
 
 DESCRIPTION="Hardened kernel sources (kernel series ${KV_MAJOR}.${KV_MINOR})"
 HOMEPAGE="http://www.grsecurity.com"
