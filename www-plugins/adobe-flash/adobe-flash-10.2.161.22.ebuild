@@ -2,9 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/www-plugins/adobe-flash/adobe-flash-10.0.45.2-r2.ebuild,v 1.1 2010/07/20 14:49:58 lack Exp $
 
-EAPI=2
 inherit nsplugins rpm multilib toolchain-funcs
-
 
 rdate="091510"
 MY_32B_URI="http://download.macromedia.com/pub/labs/flashplayer10/flashplayer_square_p1_32bit_linux_${rdate}.tar.gz"
@@ -24,7 +22,7 @@ IUSE="multilib +32bit +64bit"
 SLOT="0"
 
 KEYWORDS="-* ~amd64 ~x86"
-LICENSE="AdobeFlash-10"
+LICENSE="AdobeFlash-10.2"
 RESTRICT="strip mirror"
 
 S="${WORKDIR}"
@@ -35,10 +33,8 @@ NATIVE_DEPS="x11-libs/gtk+:2
 	net-misc/curl
 	>=sys-libs/glibc-2.4"
 
-EMUL_DEPS=">=app-emulation/emul-linux-x86-baselibs-20100220
-	app-emulation/emul-linux-x86-gtklibs
-	app-emulation/emul-linux-x86-soundlibs
-	app-emulation/emul-linux-x86-xlibs"
+EMUL_DEPS=">=app-emulation/emul-linux-x86-gtklibs-20100409-r1
+	app-emulation/emul-linux-x86-soundlibs"
 
 RDEPEND="x86? ( $NATIVE_DEPS )
 	amd64? (
