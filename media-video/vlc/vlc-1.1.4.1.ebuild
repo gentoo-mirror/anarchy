@@ -1,6 +1,6 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-video/vlc/vlc-1.1.3.ebuild,v 1.1 2010/08/19 09:50:37 aballier Exp $
+# $Header: /var/cvsroot/gentoo-x86/media-video/vlc/vlc-1.1.4.1.ebuild,v 1.1 2010/09/29 01:20:28 aballier Exp $
 
 EAPI="3"
 
@@ -17,7 +17,7 @@ if [ "${PV%9999}" != "${PV}" ] ; then
 	fi
 fi
 
-inherit eutils multilib autotools toolchain-funcs gnome2 nsplugins qt4 flag-o-matic ${SCM}
+inherit eutils multilib autotools toolchain-funcs gnome2 qt4 flag-o-matic ${SCM}
 
 MY_PV="${PV/_/-}"
 MY_PV="${MY_PV/-beta/-test}"
@@ -105,7 +105,7 @@ RDEPEND="
 		ncurses? ( sys-libs/ncurses )
 		nsplugin? ( >=net-libs/xulrunner-1.9.2 x11-libs/libXpm x11-libs/libXt x11-libs/libxcb x11-libs/xcb-util )
 		ogg? ( media-libs/libogg )
-		opengl? ( virtual/opengl x11-libs/libX11[xcb] )
+		opengl? ( virtual/opengl || ( <x11-libs/libX11-1.3.99.901[xcb] >=x11-libs/libX11-1.3.99.901 ) )
 		png? ( media-libs/libpng sys-libs/zlib )
 		projectm? ( media-libs/libprojectm )
 		pulseaudio? ( >=media-sound/pulseaudio-0.9.11
@@ -216,6 +216,11 @@ src_prepare() {
 
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}/patches"
 	eautoreconf
+
+	# Fix plugin install dir
+	einfo "Fixing installation location for libvlcplugin"
+	 sed -i -e 's:\$(libdir)\/mozilla\/plugins:\$(libdir)\/nsbrowser\/plugins:g' \
+		${S}/projects/mozilla/Makefile.am || die "failed to fix libvlcplugin installation dir"
 }
 
 src_configure() {
@@ -346,12 +351,6 @@ src_install() {
 
 	rm -rf "${D}/usr/share/doc/vlc" \
 		"${D}"/usr/share/vlc/vlc{16x16,32x32,48x48,128x128}.{png,xpm,ico}
-
-	if use nsplugin; then
-		dodir "/usr/$(get_libdir)/${PLUGINS_DIR}"
-		mv "${D}"/usr/$(get_libdir)/mozilla/plugins/* \
-			"${D}/usr/$(get_libdir)/${PLUGINS_DIR}/"
-	fi
 
 	use skins || rm -rf "${D}/usr/share/vlc/skins2"
 }

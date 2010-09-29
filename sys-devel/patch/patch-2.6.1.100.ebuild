@@ -6,7 +6,7 @@ inherit flag-o-matic
 
 DESCRIPTION="Utility to apply diffs to files"
 HOMEPAGE="http://www.gnu.org/software/patch/patch.html"
-SRC_URI="ftp://alpha.gnu.org/gnu/patch/${P}-423d.tar.gz"
+SRC_URI="ftp://alpha.gnu.org/gnu/patch/${P}-86e12.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -17,7 +17,7 @@ RDEPEND=""
 DEPEND="${RDEPEND}
 	test? ( sys-apps/ed )"
 
-S="${WORKDIR}/${P}-423d"
+S="${WORKDIR}/${P}-86e12"
 
 src_compile() {
 	use static && append-ldflags -static
