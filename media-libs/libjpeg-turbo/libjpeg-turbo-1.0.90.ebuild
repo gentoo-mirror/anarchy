@@ -1,6 +1,6 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-libs/libjpeg-turbo/libjpeg-turbo-1.0.1.ebuild,v 1.1 2010/09/20 17:57:09 ssuominen Exp $
+# $Header: $
 
 EAPI=2
 inherit libtool
@@ -32,6 +32,6 @@ src_configure() {
 
 src_install() {
 	emake DESTDIR="${D}" install || die
-	dodoc BUILDING.txt ChangeLog.txt example.c README-turbo.txt *.doc
+	dodoc BUILDING.txt ChangeLog.txt example.c README-turbo.txt
 	find "${D}" -name '*.la' -delete
 }
