@@ -25,7 +25,7 @@ src_prepare() {
 
 src_configure() {
 	econf \
-		 --with-jpeg8 \
+		--with-jpeg8 \
 		--disable-dependency-tracking \
 		$(use_enable static-libs static)
 }
