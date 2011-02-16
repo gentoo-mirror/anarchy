@@ -15,6 +15,8 @@ SLOT="0"
 KEYWORDS="amd64 ppc ~ppc64 ~sparc x86"
 IUSE=""
 
+S="${WORKDIR}/${PN}"
+
 DEPEND="media-libs/libdvdread
 	>=media-gfx/imagemagick-5.5.7.14
 	>=dev-libs/libxml2-2.6.0
@@ -22,12 +24,8 @@ DEPEND="media-libs/libdvdread
 	dev-libs/fribidi
 	media-libs/libpng"
 
-src_unpack() {
-	unpack ${A}
-}
-
 src_prepare() {
-	epatch "${FILESDIR}/${P}-libpng-1.5.patch"
+	epatch "${FILESDIR}"/${P}-libpng1.5.patch
 }
 
 src_install() {
