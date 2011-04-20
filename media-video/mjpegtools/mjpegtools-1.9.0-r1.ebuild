@@ -36,12 +36,12 @@ S="${WORKDIR}/${MY_P}"
 src_unpack() {
 	unpack ${A}
 	cd "${S}"
-	sed -i -e '/ARCHFLAGS=/s:=.*:=:' configure
 	epatch "${FILESDIR}"/${P}-glibc-2.10.patch \
 		"${FILESDIR}"/${P}-jpeg-7.patch \
 		"${FILESDIR}"/${P}-v4l-automagic.patch
 
 	eautoreconf
+	sed -i -e '/ARCHFLAGS=/s:=.*:=:' configure
 }
 
 src_compile() {
