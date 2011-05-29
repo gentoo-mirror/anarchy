@@ -268,6 +268,7 @@ src_prepare() {
 	cp -f "${FILESDIR}/${PN}-3.3-libpng-1.5.diff" "${S}/patches/hotfixes"
 	cp -f "${FILESDIR}/${PN}-3.3.1-neon_remove_SSPI_support.diff" "${S}/patches/hotfixes"
 	cp -f "${FILESDIR}/${PN}-libdb5-fix-check.diff" "${S}/patches/hotfixes"
+	cp -f "${FILESDIR}/${P}-bison25.diff" "${S}/patches/hotfixes"
 	cp -f "${FILESDIR}/${PN}-3.3.2-gcc46.diff" "${S}/patches/hotfixes"
 
 	#Use flag checks
