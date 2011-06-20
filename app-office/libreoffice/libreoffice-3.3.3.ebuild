@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-office/libreoffice/libreoffice-3.3.2.ebuild,v 1.2 2011/04/07 21:03:27 josejx Exp $
+# $Header: /var/cvsroot/gentoo-x86/app-office/libreoffice/libreoffice-3.3.3.ebuild,v 1.2 2011/06/17 12:41:24 scarabeus Exp $
 
 EAPI="3"
 
@@ -16,7 +16,7 @@ inherit autotools bash-completion check-reqs db-use eutils fdo-mime flag-o-matic
 
 IUSE="binfilter cups -custom-cflags dbus debug eds gnome gstreamer gtk kde ldap nsplugin odk opengl templates"
 
-MY_PV=3.3.2.2
+MY_PV=3.3.3.1
 MY_P="${PN}-build-${MY_PV}"
 PATCHLEVEL=OOO320
 SRC=OOo_${PV}_src
@@ -96,6 +96,8 @@ ADDONS_SRC+=" http://download.go-oo.org/src/47e1edaa44269bc537ae8cabebb0f638-JLa
 ADDONS_SRC+=" http://download.go-oo.org/src/90401bca927835b6fbae4a707ed187c8-nlpsolver-0.9.tar.bz2"
 ADDONS_SRC+=" http://download.go-oo.org/src/0f63ee487fda8f21fafa767b3c447ac9-ixion-0.2.0.tar.gz"
 ADDONS_SRC+=" http://download.go-oo.org/extern/185d60944ea767075d27247c3162b3bc-unowinreg.dll"
+ADDONS_SRC+=" http://download.go-oo.org/src/5ff846847dab351604ad859e2fd4ed3c-libwpd-0.9.1.tar.bz2"
+ADDONS_SRC+=" http://download.go-oo.org/src/5ba6a61a2f66dfd5fee8cdd4cd262a37-libwpg-0.2.0.tar.bz2"
 ADDONS_SRC+=" http://download.go-oo.org/src/9e436bff44c60dc8b97cba0c7fc11a5c-libwps-0.2.0.tar.bz2"
 ADDONS_SRC+=" http://www.numbertext.org/linux/881af2b7dca9b8259abbca00bbbc004d-LinLibertineG-20110101.zip"
 SRC_URI+=" ${ADDONS_SRC}"
@@ -257,7 +259,7 @@ src_prepare() {
 	fi
 
 	# Some fixes for our patchset
-	epatch "${FILESDIR}/gentoo-${PV}.diff"
+	epatch "${FILESDIR}/gentoo-3.3.2.diff"
 	epatch "${FILESDIR}/gentoo-pythonpath.diff"
 	epatch "${FILESDIR}/env_log.diff"
 	epatch "${FILESDIR}/fix-ooo-collision.diff"
@@ -268,7 +270,7 @@ src_prepare() {
 	cp -f "${FILESDIR}/${PN}-3.3-libpng-1.5.diff" "${S}/patches/hotfixes"
 	cp -f "${FILESDIR}/${PN}-3.3.1-neon_remove_SSPI_support.diff" "${S}/patches/hotfixes"
 	cp -f "${FILESDIR}/${PN}-libdb5-fix-check.diff" "${S}/patches/hotfixes"
-	cp -f "${FILESDIR}/${P}-bison25.diff" "${S}/patches/hotfixes"
+	cp -f "${FILESDIR}/${PN}-3.3.2-bison25.diff" "${S}/patches/hotfixes"
 	cp -f "${FILESDIR}/${PN}-3.3.2-gcc46.diff" "${S}/patches/hotfixes"
 
 	#Use flag checks
