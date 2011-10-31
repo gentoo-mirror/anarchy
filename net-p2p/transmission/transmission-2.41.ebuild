@@ -44,15 +44,13 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# Bug #387709, workaround redefines
-	if use !utp; then
-		epatch "${FILESDIR}/${P}-no_utp.patch"
-	fi
-
 	# https://trac.transmissionbt.com/ticket/4323
 	epatch "${FILESDIR}/${PN}-2.33-0001-configure.ac.patch"
 	epatch "${FILESDIR}/${PN}-2.33-0002-config.in-4-qt.pro.patch"
 	epatch "${FILESDIR}/${P}-0003-system-miniupnpc.patch"
+
+	# Bug #387709 upstream fix
+	epatch "${FILESDIR}/${P}-no_utp.patch"
 
 	# Upstream is not interested in this: https://trac.transmissionbt.com/ticket/4324
 	sed -e 's|noinst\(_PROGRAMS = $(TESTS)\)|check\1|' -i libtransmission/Makefile.am || die
