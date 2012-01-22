@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-misc/wicd/wicd-1.7.1_beta2-r7.ebuild,v 1.3 2011/10/27 21:04:41 tomka Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-misc/wicd/wicd-1.7.1_pre20111210-r1.ebuild,v 1.2 2011/12/30 09:43:31 tomka Exp $
 
 EAPI=3
 
@@ -10,15 +10,15 @@ SUPPORT_PYTHON_ABIS="1"
 RESTRICT_PYTHON_ABIS="3.* *-jython"
 DISTUTILS_USE_SEPARATE_SOURCE_DIRECTORIES="1"
 
-inherit eutils distutils
+inherit eutils distutils systemd
 
-MY_P=${P/_beta/b}
-S="${WORKDIR}/${MY_P}"
+MY_PV="${PN}-1.7.1"
+S="${WORKDIR}/${MY_PV}"
 
 DESCRIPTION="A lightweight wired and wireless network manager for Linux"
 HOMEPAGE="http://wicd.sourceforge.net/"
-SRC_URI="http://downloads.wicd.net/src/testing/1.7.x/${MY_P}.tar.bz2
-	mac4lin? ( http://dev.gentoo.org/~anarchy/dist/wicd-mac4lin-icons.tar.bz2 ) "
+SRC_URI="http://dev.gentoo.org/~tomka/files/${P}.tar.gz
+	mac4lin? ( http://dev.gentoo.org/~anarchy/dist/wicd-mac4lin-icons.tar.xz )"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -53,7 +53,7 @@ RDEPEND="
 	ioctl? ( dev-python/python-iwscan dev-python/python-wpactrl )
 	libnotify? ( dev-python/notify-python )
 	ncurses? (
-		>=dev-python/urwid-1.0.0
+		dev-python/urwid
 		dev-python/pygobject:2
 	)
 	pm-utils? ( >=sys-power/pm-utils-1.1.1 )
@@ -61,14 +61,12 @@ RDEPEND="
 DOCS="CHANGES NEWS AUTHORS README"
 
 src_prepare() {
-	epatch "${FILESDIR}"/${P}-init.patch
-	# Fix urwid calls
-	epatch "${FILESDIR}/${P}"-urwid-1.0.patch
+	epatch "${FILESDIR}"/${PN}-1.7.1_beta2-init.patch
 	epatch "${FILESDIR}"/${PN}-init-sve-start.patch
-	# Fix ad-hoc networking (bug 351337)
-	epatch "${FILESDIR}"/fix-ad-hoc-networking.patch
+	# Fix bug 394309
+	epatch "${FILESDIR}"/${P}-fix-config-reading.patch
 	# Add a template for hex psk's and wpa (Bug 306423)
-	epatch "${FILESDIR}"/add-wpa-psk-hex-template.patch
+	epatch "${FILESDIR}"/${P}-wpa-psk-hex-template.patch
 	# get rid of opts variable to fix bug 381885
 	sed -i "/opts/d" "in/init=gentoo=wicd.in"
 	# Need to ensure that generated scripts use Python 2 at run time.
@@ -98,6 +96,8 @@ src_install() {
 	keepdir /var/log/wicd \
 		|| die "keepdir failed, critical for this app"
 	use nls || rm -rf "${D}"/usr/share/locale
+	systemd_dounit "${S}/other/wicd.service"
+
 	if use mac4lin; then
 		rm -rf "${D}"/usr/share/pixmaps/wicd || die "Failed to remove old icons"
 		mv "${WORKDIR}"/wicd "${D}"/usr/share/pixmaps/
