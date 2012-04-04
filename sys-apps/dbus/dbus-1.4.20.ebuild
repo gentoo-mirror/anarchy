@@ -1,12 +1,8 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-apps/dbus/dbus-1.4.18.ebuild,v 1.1 2012/02/14 21:12:06 ssuominen Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-apps/dbus/dbus-1.4.20.ebuild,v 1.1 2012/03/29 20:05:00 ssuominen Exp $
 
 EAPI=4
-
-PYTHON_DEPEND="test? 2:2.7"
-PYTHON_USE_WITH_OPT="test"
-
 inherit autotools eutils multilib flag-o-matic python systemd virtualx
 
 DESCRIPTION="A message bus system, a simple way for applications to talk to each other"
@@ -34,8 +30,10 @@ DEPEND="${RDEPEND}
 		app-text/docbook-xml-dtd:4.1.2
 		app-text/xmlto
 		)
-	test? ( >=dev-libs/glib-2.28 )
-	!<dev-libs/glib-2.30.1-r2:2"
+	test? (
+		>=dev-libs/glib-2.24
+		dev-lang/python:2.7
+		)"
 
 # out of sources build directory
 BD=${WORKDIR}/${P}-build
@@ -46,6 +44,7 @@ pkg_setup() {
 	enewgroup messagebus
 	enewuser messagebus -1 -1 -1 messagebus
 
+	# FIXME: Test suite fails with Python 3.2 (last checked: 1.4.20)
 	if use test; then
 		python_set_active_version 2
 		python_pkg_setup
@@ -67,14 +66,15 @@ src_prepare() {
 }
 
 src_configure() {
-	local my_conf
+	local myconf
 
 	# so we can get backtraces from apps
 	append-flags -rdynamic
 
 	# libaudit is *only* used in DBus wrt SELinux support, so disable it, if
 	# not on an SELinux profile.
-	my_conf="--disable-asserts
+	myconf=(
+		--disable-asserts
 		--disable-checks
 		--disable-embedded-tests
 		--disable-modular-tests
@@ -91,31 +91,28 @@ src_configure() {
 		--with-system-socket=/var/run/dbus/system_bus_socket
 		--with-session-socket-dir=/tmp
 		--with-dbus-user=messagebus
-		$(systemd_with_unitdir)
+		"$(systemd_with_unitdir)"
 		--localstatedir=/var
 		--docdir=/usr/share/doc/${PF}
-		--htmldir=/usr/share/doc/${PF}/html"
+		--htmldir=/usr/share/doc/${PF}/html
+		)
 
 	mkdir "${BD}"
 	cd "${BD}"
 	einfo "Running configure in ${BD}"
-	ECONF_SOURCE="${S}" econf ${my_conf} \
+	ECONF_SOURCE="${S}" econf "${myconf[@]}" \
 		$(use_enable doc doxygen-docs) \
 		$(use_enable doc xml-docs)
 
 	if use test; then
-		local cir
-		has_version dev-libs/dbus-glib && cir="--enable-modular-tests"
-
 		mkdir "${TBD}"
 		cd "${TBD}"
 		einfo "Running configure in ${TBD}"
-		ECONF_SOURCE="${S}" econf \
-			${my_conf} \
+		ECONF_SOURCE="${S}" econf "${myconf[@]}" \
 			$(use_enable test checks) \
 			$(use_enable test embedded-tests) \
 			$(use_enable test asserts) \
-			${cir}
+			$(has_version dev-libs/dbus-glib && echo --enable-modular-tests)
 	fi
 }
 
@@ -141,22 +138,21 @@ src_test() {
 }
 
 src_install() {
-	# initscript
 	newinitd "${FILESDIR}"/dbus.initd dbus
 
 	if use X; then
 		# dbus X session script (#77504)
 		# turns out to only work for GDM (and startx). has been merged into
 		# other desktop (kdm and such scripts)
-		exeinto /etc/X11/xinit/xinitrc.d/
+		exeinto /etc/X11/xinit/xinitrc.d
 		doexe "${FILESDIR}"/80-dbus
 	fi
 
 	# needs to exist for dbus sessions to launch
-	keepdir /usr/lib/dbus-1.0/services
 	keepdir /usr/share/dbus-1/services
-	keepdir /etc/dbus-1/system.d/
-	keepdir /etc/dbus-1/session.d/
+	keepdir /etc/dbus-1/system.d
+	keepdir /etc/dbus-1/session.d
+	keepdir /var/lib/dbus # See pkg_postinst() for symlink creation
 
 	dodoc AUTHORS ChangeLog HACKING NEWS README doc/TODO
 
@@ -178,8 +174,9 @@ pkg_postinst() {
 	ewarn "the new version of the daemon."
 	ewarn "Don't do this while X is running because it will restart your X as well."
 
-	# Move to /etc per #370451 and ensure unique id is generated
-	[[ -e ${EROOT}/var/lib/dbus/machine-id ]] && \
-		mv -vf "${EROOT}"/var/lib/dbus/machine-id "${EROOT}"/etc/machine-id
+	# Ensure unique id is generated and put it in /etc wrt #370451 but symlink
+	# for DBUS_MACHINE_UUID_FILE (see tools/dbus-launch.c) and reverse
+	# dependencies with hardcoded paths (although the known ones got fixed already)
 	dbus-uuidgen --ensure="${EROOT}"/etc/machine-id
+	ln -sf "${EROOT}"/etc/machine-id "${EROOT}"/var/lib/dbus/machine-id
 }
