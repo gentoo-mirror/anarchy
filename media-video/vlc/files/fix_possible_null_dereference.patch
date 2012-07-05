@@ -1,0 +1,28 @@
+commit 8dcf122757baafc6d84821772c0fecc3e72f71af
+Author: Laurent Aimar <fenrir@videolan.org>
+Date:   Fri Jun 1 22:27:36 2012 +0200
+
+    Fixed potential NULL dereference when using video filter when transcoding.
+    
+    It closes #4409.
+
+diff --git a/modules/stream_out/transcode/video.c b/modules/stream_out/transcode/video.c
+index 97f88ea..3ab053e 100644
+--- a/modules/stream_out/transcode/video.c
++++ b/modules/stream_out/transcode/video.c
+@@ -656,10 +656,14 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
+         /* Run filter chain */
+         if( id->p_f_chain )
+             p_pic = filter_chain_VideoFilter( id->p_f_chain, p_pic );
++        if( !p_pic )
++            continue;
+ 
+         /* Run user specified filter chain */
+         if( id->p_uf_chain )
+             p_pic = filter_chain_VideoFilter( id->p_uf_chain, p_pic );
++        if( !p_pic )
++            continue;
+ 
+         /*
+          * Encoding
+
