@@ -212,7 +212,7 @@ src_configure() {
 	use alpha && append-ldflags "-Wl,--no-relax"
 
 	# We must force enable jemalloc 3 threw .mozconfig
-	echo "export MOZ_JEMALLOC=1" > ${S}/.mozconfig
+	echo "export MOZ_JEMALLOC=1" >> ${S}/.mozconfig
 
 	# Basic options to control the enviroment in which we compile
 	mozconfig_annotate '' --prefix="${EPREFIX}"/usr
