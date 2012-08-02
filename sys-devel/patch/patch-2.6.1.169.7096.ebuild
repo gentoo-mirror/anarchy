@@ -2,11 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit flag-o-matic
+inherit flag-o-matic versionator
+
+MY_PV="$(replace_version_separator 4 '-' )"
 
 DESCRIPTION="Utility to apply diffs to files"
 HOMEPAGE="http://www.gnu.org/software/patch/patch.html"
-SRC_URI="mirror://gnu-alpha/patch/${P}-7096.tar.gz"
+SRC_URI="mirror://gnu-alpha/patch/${PN}-${MY_PV}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -17,7 +19,7 @@ RDEPEND=""
 DEPEND="${RDEPEND}
 	test? ( sys-apps/ed )"
 
-S="${WORKDIR}/${P}-7096"
+S="${WORKDIR}/${PN}-${MY_PV}"
 
 src_compile() {
 	use static && append-ldflags -static
