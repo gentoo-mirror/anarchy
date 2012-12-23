@@ -10,23 +10,23 @@ description_reload_rules='Reload daemon rules'
 description_reload_auditd='Reload daemon configuration'
 
 name='auditd'
-pidfile='/var/run/auditd.pid'
+pidfile='/run/auditd.pid'
 command='/sbin/auditd'
 
 start_auditd() {
 	# Env handling taken from the upstream init script
-	if [ -z "$AUDITD_LANG" -o "$AUDITD_LANG" = "none" -o "$AUDITD_LANG" = "NONE" ]; then
-		unset LANG LC_TIME LC_ALL LC_MESSAGES LC_NUMERIC LC_MONETARY LC_COLLATE
-	else
-		LANG="$AUDITD_LANG"
-		LC_TIME="$AUDITD_LANG"
-		LC_ALL="$AUDITD_LANG"
-		LC_MESSAGES="$AUDITD_LANG"
-		LC_NUMERIC="$AUDITD_LANG"
-		LC_MONETARY="$AUDITD_LANG"
-		LC_COLLATE="$AUDITD_LANG"
-		export LANG LC_TIME LC_ALL LC_MESSAGES LC_NUMERIC LC_MONETARY LC_COLLATE
-	fi
+    if [ -z "$AUDITD_LANG" -o "$AUDITD_LANG" = "none" -o "$AUDITD_LANG" = "NONE" ]; then
+        unset LANG LC_TIME LC_ALL LC_MESSAGES LC_NUMERIC LC_MONETARY LC_COLLATE
+    else
+        LANG="$AUDITD_LANG"
+        LC_TIME="$AUDITD_LANG"
+        LC_ALL="$AUDITD_LANG"
+        LC_MESSAGES="$AUDITD_LANG"
+        LC_NUMERIC="$AUDITD_LANG"
+        LC_MONETARY="$AUDITD_LANG"
+        LC_COLLATE="$AUDITD_LANG"
+        export LANG LC_TIME LC_ALL LC_MESSAGES LC_NUMERIC LC_MONETARY LC_COLLATE
+    fi  
 	unset HOME MAIL USER USERNAME
 
 	ebegin "Starting ${name}"
