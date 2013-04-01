@@ -1,0 +1,238 @@
+diff -urN a/configure.ac b/configure.ac
+--- a/configure.ac	2013-04-01 13:01:16.129562906 -0500
++++ b/configure.ac	2013-04-01 13:01:58.213560028 -0500
+@@ -125,7 +125,7 @@
+ AC_SUBST(GLIB_CFLAGS)
+ AC_SUBST(GLIB_LIBS)
+ 
+-PKG_CHECK_MODULES(LIBJS, [mozjs185])
++PKG_CHECK_MODULES(LIBJS, [mozjs-17.0])
+ AC_SUBST(LIBJS_CFLAGS)
+ AC_SUBST(LIBJS_LIBS)
+ 
+diff -urN a/src/polkitbackend/Makefile.am b/src/polkitbackend/Makefile.am
+--- a/src/polkitbackend/Makefile.am	2013-04-01 13:01:16.120562906 -0500
++++ b/src/polkitbackend/Makefile.am	2013-04-01 13:01:58.213560028 -0500
+@@ -57,6 +57,7 @@
+ # Note: We don't include $(LIBJS_LIBS) here since it's dlopen()'ed in polkitbackendjsauthority.c
+ #
+ libpolkit_backend_1_la_LIBADD =                               		\
++	$(LIBJS_LIBS)							\
+         $(GLIB_LIBS)							\
+ 	$(LIBSYSTEMD_LOGIN_LIBS)					\
+ 	$(top_builddir)/src/polkit/libpolkit-gobject-1.la		\
+diff -urN a/src/polkitbackend/polkitbackendjsauthority.c b/src/polkitbackend/polkitbackendjsauthority.c
+--- a/src/polkitbackend/polkitbackendjsauthority.c	2013-04-01 13:01:16.119562906 -0500
++++ b/src/polkitbackend/polkitbackendjsauthority.c	2013-04-01 13:01:48.033560724 -0500
+@@ -138,36 +138,35 @@
+ 
+ /* ---------------------------------------------------------------------------------------------------- */
+ 
+-static JSBool          (*dJS_CallFunctionName)(JSContext *cx, JSObject *obj, const char *name, uintN argc, jsval *argv, jsval *rval);
+-static JSObject       *(*dJS_CompileFile)(JSContext *cx, JSObject *obj, const char *filename);
+-static JSBool          (*dJS_ConvertArguments)(JSContext *cx, uintN argc, jsval *argv, const char *format, ...);
++static JSBool          (*dJS_CallFunctionName)(JSContext *cx, JSObject *obj, const char *name, unsigned argc, jsval *argv, jsval *rval);
++static JSObject       *(*dJS_CompileUTF8File)(JSContext *cx, JSObject *obj, const char *filename);
++static JSBool          (*dJS_ConvertArguments)(JSContext *cx, unsigned argc, jsval *argv, const char *format, ...);
+ static JSBool          (*dJS_ConvertStub)(JSContext *cx, JSObject *obj, JSType type, jsval *vp);
+ static JSBool          (*dJS_DefineFunctions)(JSContext *cx, JSObject *obj, JSFunctionSpec *fs);
+-static JSObject       *(*dJS_DefineObject)(JSContext *cx, JSObject *obj, const char *name, JSClass *clasp, JSObject *proto, uintN attrs);
++static JSObject       *(*dJS_DefineObject)(JSContext *cx, JSObject *obj, const char *name, JSClass *clasp, JSObject *proto, unsigned attrs);
+ static void            (*dJS_DestroyContext)(JSContext *cx);
+ #define dJS_DestroyRuntime dJS_Finish
+ static void            (*dJS_Finish)(JSRuntime *rt);
+ static char           *(*dJS_EncodeString)(JSContext *cx, JSString *str);
+ static JSBool          (*dJS_EnumerateStub)(JSContext *cx, JSObject *obj);
+ static JSBool          (*dJS_EvaluateScript)(JSContext *cx, JSObject *obj,
+-                                             const char *bytes, uintN length,
+-                                             const char *filename, uintN lineno,
++                                             const char *bytes, unsigned length,
++                                             const char *filename, unsigned lineno,
+                                              jsval *rval);
+ static JSBool          (*dJS_ExecuteScript)(JSContext *cx, JSObject *obj, JSObject *scriptObj, jsval *rval);
+-static void            (*dJS_FinalizeStub)(JSContext *cx, JSObject *obj);
+ static void            (*dJS_free)(JSContext *cx, void *p);
+ static void            (*dJS_GC)(JSContext *cx);
+-static JSBool          (*dJS_GetArrayLength)(JSContext *cx, JSObject *obj, jsuint *lengthp);
++static JSBool          (*dJS_GetArrayLength)(JSContext *cx, JSObject *obj, guint32 *lengthp);
+ static void           *(*dJS_GetContextPrivate)(JSContext *cx);
+-static JSBool          (*dJS_GetElement)(JSContext *cx, JSObject *obj, jsint index, jsval *vp);
++static JSBool          (*dJS_GetElement)(JSContext *cx, JSObject *obj, gint32 index, jsval *vp);
+ static const jschar   *(*dJS_GetStringCharsZ)(JSContext *cx, JSString *str);
+ static JSBool          (*dJS_InitStandardClasses)(JSContext *cx, JSObject *obj);
+ static void            (*dJS_MaybeGC)(JSContext *cx);
+-static JSObject       *(*dJS_NewArrayObject)(JSContext *cx, jsint length, jsval *vector);
+-static JSObject       *(*dJS_NewCompartmentAndGlobalObject)(JSContext *cx, JSClass *clasp, JSPrincipals *principals);
++static JSObject       *(*dJS_NewArrayObject)(JSContext *cx, gint32 length, jsval *vector);
++static JSObject       *(*dJS_NewGlobalObject)(JSContext *cx, JSClass *clasp, JSPrincipals *principals);
+ static JSContext      *(*dJS_NewContext)(JSRuntime *rt, size_t stackChunkSize);
+ #define dJS_NewRuntime dJS_Init
+-static JSRuntime      *(*dJS_Init)(uint32 maxbytes);
++static JSRuntime      *(*dJS_Init)(guint32 maxbytes);
+ static JSString       *(*dJS_NewStringCopyZ)(JSContext *cx, const char *s);
+ static JSBool          (*dJS_PropertyStub)(JSContext *cx, JSObject *obj, jsid id, jsval *vp);
+ static void            (*dJS_ReportError)(JSContext *cx, const char *format, ...);
+@@ -176,13 +175,13 @@
+ static void            (*dJS_SetContextPrivate)(JSContext *cx, void *data);
+ static JSErrorReporter (*dJS_SetErrorReporter)(JSContext *cx, JSErrorReporter er);
+ JSOperationCallback    (*dJS_SetOperationCallback)(JSContext *cx, JSOperationCallback callback);
+-static uint32          (*dJS_SetOptions)(JSContext *cx, uint32 options);
++static guint32        (*dJS_SetOptions)(JSContext *cx, guint32 options);
+ static void            (*dJS_SetPendingException)(JSContext *cx, jsval v);
+ static JSBool          (*dJS_SetProperty)(JSContext *cx, JSObject *obj, const char *name, jsval *vp);
+ static JSVersion       (*dJS_SetVersion)(JSContext *cx, JSVersion version);
+ static void            (*dJS_ShutDown)(void);
+ static JSBool          (*dJS_StrictPropertyStub)(JSContext *cx, JSObject *obj, jsid id, JSBool strict, jsval *vp);
+-static void            (*dJS_TriggerOperationCallback)(JSContext *cx);
++static void            (*dJS_TriggerOperationCallback)(JSRuntime *rt);
+ 
+ #define DJS_SYMBOL(x) {#x, (void*) &d ## x}
+ static const struct {
+@@ -190,7 +189,7 @@
+   gpointer *ptr;
+ } djs_symbols[] = {
+   DJS_SYMBOL(JS_CallFunctionName),
+-  DJS_SYMBOL(JS_CompileFile),
++  DJS_SYMBOL(JS_CompileUTF8File),
+   DJS_SYMBOL(JS_ConvertArguments),
+   DJS_SYMBOL(JS_ConvertStub),
+   DJS_SYMBOL(JS_DefineFunctions),
+@@ -201,7 +200,6 @@
+   DJS_SYMBOL(JS_EnumerateStub),
+   DJS_SYMBOL(JS_EvaluateScript),
+   DJS_SYMBOL(JS_ExecuteScript),
+-  DJS_SYMBOL(JS_FinalizeStub),
+   DJS_SYMBOL(JS_free),
+   DJS_SYMBOL(JS_GC),
+   DJS_SYMBOL(JS_GetArrayLength),
+@@ -211,7 +209,7 @@
+   DJS_SYMBOL(JS_InitStandardClasses),
+   DJS_SYMBOL(JS_MaybeGC),
+   DJS_SYMBOL(JS_NewArrayObject),
+-  DJS_SYMBOL(JS_NewCompartmentAndGlobalObject),
++  DJS_SYMBOL(JS_NewGlobalObject),
+   DJS_SYMBOL(JS_NewContext),
+   DJS_SYMBOL(JS_Init), /* Macro: JS_NewRuntime */
+   DJS_SYMBOL(JS_NewStringCopyZ),
+@@ -239,7 +237,7 @@
+   guint n;
+   const gchar *library_name;
+ 
+-  library_name = "libmozjs185.so.1.0";
++  library_name = "libmozjs-17.0.so";
+   module = g_module_open (library_name, 0);
+   if (module == NULL)
+     goto out;
+@@ -278,9 +276,9 @@
+ static JSClass js_global_class = {0};
+ static JSClass js_polkit_class = {0};
+ 
+-static JSBool js_polkit_log (JSContext *cx, uintN argc, jsval *vp);
+-static JSBool js_polkit_spawn (JSContext *cx, uintN argc, jsval *vp);
+-static JSBool js_polkit_user_is_in_netgroup (JSContext *cx, uintN argc, jsval *vp);
++static JSBool js_polkit_log (JSContext *cx, unsigned argc, jsval *vp);
++static JSBool js_polkit_spawn (JSContext *cx, unsigned argc, jsval *vp);
++static JSBool js_polkit_user_is_in_netgroup (JSContext *cx, unsigned argc, jsval *vp);
+ 
+ static JSFunctionSpec js_polkit_functions[] =
+ {
+@@ -388,7 +386,7 @@
+       const gchar *filename = l->data;
+       JSObject *script;
+ 
+-      script = dJS_CompileFile (authority->priv->cx,
++      script = dJS_CompileUTF8File (authority->priv->cx,
+                                 authority->priv->js_global,
+                                 filename);
+       if (script == NULL)
+@@ -562,7 +560,6 @@
+   js_global_class.enumerate   = dJS_EnumerateStub;
+   js_global_class.resolve     = dJS_ResolveStub;
+   js_global_class.convert     = dJS_ConvertStub;
+-  js_global_class.finalize    = dJS_FinalizeStub;
+ 
+   js_polkit_class.name        = "Polkit";
+   js_polkit_class.flags       = 0;
+@@ -573,9 +570,8 @@
+   js_polkit_class.enumerate   = dJS_EnumerateStub;
+   js_polkit_class.resolve     = dJS_ResolveStub;
+   js_polkit_class.convert     = dJS_ConvertStub;
+-  js_polkit_class.finalize    = dJS_FinalizeStub;
+ 
+-  authority->priv->js_global = dJS_NewCompartmentAndGlobalObject (authority->priv->cx,
++  authority->priv->js_global = dJS_NewGlobalObject (authority->priv->cx,
+                                                                   &js_global_class,
+                                                                   NULL);
+   if (authority->priv->js_global == NULL)
+@@ -789,7 +785,7 @@
+       jsvals[n] = STRING_TO_JSVAL (jsstr);
+     }
+ 
+-  array_object = dJS_NewArrayObject (authority->priv->cx, (jsint) len, jsvals);
++  array_object = dJS_NewArrayObject (authority->priv->cx, (gint32) len, jsvals);
+ 
+   value_jsval = OBJECT_TO_JSVAL (array_object);
+   dJS_SetProperty (authority->priv->cx, obj, name, &value_jsval);
+@@ -805,7 +801,7 @@
+                     gint32                     value)
+ {
+   jsval value_jsval;
+-  value_jsval = INT_TO_JSVAL ((int32) value);
++  value_jsval = INT_TO_JSVAL ((gint32) value);
+   dJS_SetProperty (authority->priv->cx, obj, name, &value_jsval);
+ }
+ 
+@@ -1060,7 +1056,7 @@
+   PolkitBackendJsAuthority *authority = POLKIT_BACKEND_JS_AUTHORITY (user_data);
+ 
+   /* Supposedly this is thread-safe... */
+-  dJS_TriggerOperationCallback (authority->priv->cx);
++  dJS_TriggerOperationCallback (authority->priv->rt);
+ 
+   /* keep source around so we keep trying to kill even if the JS bit catches the exception
+    * thrown in js_operation_callback()
+@@ -1113,7 +1109,7 @@
+ static JSBool
+ call_js_function_with_runaway_killer (PolkitBackendJsAuthority *authority,
+                                       const char               *function_name,
+-                                      uintN                     argc,
++                                      unsigned                  argc,
+                                       jsval                    *argv,
+                                       jsval                    *rval)
+ {
+@@ -1352,7 +1348,7 @@
+ 
+ static JSBool
+ js_polkit_log (JSContext  *cx,
+-               uintN       argc,
++               unsigned    argc,
+                jsval      *vp)
+ {
+   /* PolkitBackendJsAuthority *authority = POLKIT_BACKEND_JS_AUTHORITY (dJS_GetContextPrivate (cx)); */
+@@ -1435,7 +1431,7 @@
+ 
+ static JSBool
+ js_polkit_spawn (JSContext  *cx,
+-                 uintN       js_argc,
++                 unsigned    js_argc,
+                  jsval      *vp)
+ {
+   /* PolkitBackendJsAuthority *authority = POLKIT_BACKEND_JS_AUTHORITY (dJS_GetContextPrivate (cx)); */
+@@ -1446,7 +1442,7 @@
+   gint exit_status;
+   GError *error = NULL;
+   JSString *ret_jsstr;
+-  jsuint array_len;
++  guint32 array_len;
+   gchar **argv = NULL;
+   GMainContext *context = NULL;
+   GMainLoop *loop = NULL;
+@@ -1553,7 +1549,7 @@
+ 
+ static JSBool
+ js_polkit_user_is_in_netgroup (JSContext  *cx,
+-                               uintN       argc,
++                               unsigned    argc,
+                                jsval      *vp)
+ {
+   /* PolkitBackendJsAuthority *authority = POLKIT_BACKEND_JS_AUTHORITY (dJS_GetContextPrivate (cx)); */
