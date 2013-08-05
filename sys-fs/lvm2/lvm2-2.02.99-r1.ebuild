@@ -1,6 +1,6 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/lvm2/lvm2-2.02.99.ebuild,v 1.5 2013/08/02 15:53:33 ssuominen Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/lvm2/lvm2-2.02.99-r1.ebuild,v 1.1 2013/08/04 21:05:20 ssuominen Exp $
 
 EAPI=5
 inherit eutils multilib toolchain-funcs autotools linux-info udev systemd
@@ -14,7 +14,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux"
 
-IUSE="readline static static-libs clvm cman +lvm1 selinux +udev +thin"
+IUSE="readline static static-libs clvm cman +lvm1 lvm2create_initrd selinux +udev +thin"
 
 DEPEND_COMMON="clvm? ( cman? ( =sys-cluster/cman-3* ) =sys-cluster/libdlm-3* )
 	readline? ( sys-libs/readline )
@@ -27,6 +27,7 @@ RDEPEND="${DEPEND_COMMON}
 	!!sys-fs/lvm-user
 	!!sys-fs/clvm
 	>=sys-apps/util-linux-2.16
+	lvm2create_initrd? ( sys-apps/makedev )
 	thin? ( sys-block/thin-provisioning-tools )"
 # Upgrading to this LVM will break older cryptsetup
 RDEPEND="${RDEPEND}
@@ -66,7 +67,9 @@ src_prepare() {
 	epatch "${FILESDIR}"/${PN}-2.02.70-asneeded.patch # -Wl,--as-needed
 	epatch "${FILESDIR}"/${PN}-2.02.92-dynamic-static-ldflags.patch #332905
 	epatch "${FILESDIR}"/${PN}-2.02.97-udev-static.patch #370217
-	epatch "${FILESDIR}"/${PN}-2.02.99-selinux.patch #439414
+	epatch "${FILESDIR}"/${PN}-2.02.99-selinux.patch
+
+	sed -i -e 's:/usr/sbin/lvm:/sbin/lvm:' scripts/lvm2_activation_generator_systemd_red_hat.c || die #479626
 
 	# Fix calling AR directly with USE static, bug #444082, convert to patch and forward to upstream
 	if use static ; then
@@ -153,6 +156,7 @@ src_configure() {
 		--with-staticdir="${EPREFIX}/sbin" \
 		--libdir="${EPREFIX}/$(get_libdir)" \
 		--with-usrlibdir="${EPREFIX}/usr/$(get_libdir)" \
+		--with-default-dm-run-dir=/run \
 		--with-default-run-dir=/run/lvm \
 		--with-default-locking-dir=/run/lock/lvm \
 		--with-dmeventd-path=/sbin/dmeventd \
@@ -196,9 +200,11 @@ src_install() {
 		#gen_usr_ldscript libdevmapper.so
 	fi
 
-	dosbin "${S}"/scripts/lvm2create_initrd/lvm2create_initrd
-	doman  "${S}"/scripts/lvm2create_initrd/lvm2create_initrd.8
-	newdoc "${S}"/scripts/lvm2create_initrd/README README.lvm2create_initrd
+	if use lvm2create_initrd; then
+		dosbin "${S}"/scripts/lvm2create_initrd/lvm2create_initrd
+		doman  "${S}"/scripts/lvm2create_initrd/lvm2create_initrd.8
+		newdoc "${S}"/scripts/lvm2create_initrd/README README.lvm2create_initrd
+	fi
 
 	insinto /etc
 	doins "${FILESDIR}"/dmtab
@@ -215,6 +221,9 @@ src_install() {
 
 	use static-libs || \
 	rm -f "${D}"/usr/$(get_libdir)/{libdevmapper-event,liblvm2cmd,liblvm2app,libdevmapper}.a
+
+	#insinto /etc/udev/rules.d/
+	#newins "${FILESDIR}"/64-device-mapper.rules-2.02.56-r3 64-device-mapper.rules
 
 	# do not rely on /lib -> /libXX link
 	sed -i \
