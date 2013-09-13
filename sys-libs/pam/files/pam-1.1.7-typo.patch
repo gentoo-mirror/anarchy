@@ -6,7 +6,7 @@ diff -urN a/modules/pam_unix/pam_unix_passwd.c b/modules/pam_unix/pam_unix_passw
  	close(fds[1]);
  	/* wait for helper to complete: */
 -	while ((rc=waitpid(child, &retval, 0) < 0 && errno == EINTR);
-+	while (rc=waitpid(child, &retval, 0) < 0 && errno == EINTR);
++	while ((rc=waitpid(child, &retval, 0)) < 0 && errno == EINTR);
  	if (rc<0) {
  	  pam_syslog(pamh, LOG_ERR, "unix_update waitpid failed: %m");
  	  retval = PAM_AUTHTOK_ERR;
