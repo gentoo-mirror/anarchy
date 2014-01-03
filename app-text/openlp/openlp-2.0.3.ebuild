@@ -37,6 +37,6 @@ python_install_all() {
 	distutils-r1_python_install_all
 	domenu  resources/openlp.desktop
 	dosym  openlp.pyw /usr/bin/openlp
-	doicon resources/images/openlp.svg
+	doicon -s scalable resources/images/openlp.svg
 }
 
