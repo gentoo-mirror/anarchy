@@ -33,10 +33,9 @@ DEPEND="${RDEPEND}"
 
 S=${WORKDIR}/OpenLP-${PV}
 
-python_install_all() { 
+python_install_all() {
 	distutils-r1_python_install_all
 	domenu  resources/openlp.desktop
 	dosym  openlp.pyw /usr/bin/openlp
 	doicon -s scalable resources/images/openlp.svg
 }
-
