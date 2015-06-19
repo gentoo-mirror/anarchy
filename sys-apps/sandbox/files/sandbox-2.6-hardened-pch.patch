@@ -1,0 +1,88 @@
+From: Mike Frysinger <vapier@gentoo.org>
+Date: Tue, 28 Aug 2012 16:19:56 +0000 (-0400)
+Subject: add a configure option to control pch usage
+X-Git-Url: http://git.overlays.gentoo.org/gitweb/?p=proj%2Fsandbox.git;a=commitdiff_plain;h=f2500f5954611d110ac18e9990f42d5a915f8101
+
+add a configure option to control pch usage
+
+Mostly for testing purposes.  This also tweaks the dependency to fix a
+warning when generating the headers.h.pch in subdirs when the toplevel
+headers.h.pch already exists.
+
+URL: http://bugs.gentoo.org/425524
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+
+diff --git a/Makefile.am b/Makefile.am
+index 475c8c0..eb54f42 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -11,9 +11,9 @@ SUBDIRS = \
+ 	src        \
+ 	tests
+ 
++noinst_LTLIBRARIES =
++
+ SANDBOX_PCH = headers.h.gch libsandbox/headers.h.gch libsbutil/headers.h.gch
+-BUILT_SOURCES = $(SANDBOX_PCH)
+-noinst_LTLIBRARIES = libpch.la
+ nodist_libpch_la_SOURCES = $(SANDBOX_PCH)
+ GCH_CP = ( \
+ 	src=`dirname $@`/.libs/`basename $@`.o; \
+@@ -30,10 +30,23 @@ $(builddir)/libsandbox/headers.h.gch: headers.h
+ $(builddir)/headers.h.gch: headers.h
+ 	$(AM_V_GEN)$(COMPILE) -c -o $@.o $< && $(GCH_CP)
+ 
+-libsbutil: libsbutil/headers.h.gch
+-libsandbox: libsbutil libsandbox/headers.h.gch
+-src: libsbutil headers.h.gch
+-tests: src headers.h.gch
++if SB_BUILD_PCH
++BUILT_SOURCES = $(SANDBOX_PCH)
++noinst_LTLIBRARIES += libpch.la
++
++LIBSBUTIL_PCH = libsbutil/headers.h.gch
++LIBSANDBOX_PCH = libsandbox/headers.h.gch
++TOP_PCH = headers.h.gch
++
++# Make sure we build the subdirs before the top so they don't
++# try to use the top level headers.h.pch.
++$(TOP_PCH): $(LIBSBUTIL_PCH) $(LIBSANDBOX_PCH)
++endif
++
++libsbutil: $(LIBSBUTIL_PCH)
++libsandbox: libsbutil $(LIBSANDBOX_PCH)
++src: libsbutil $(TOP_PCH)
++tests: src $(TOP_PCH)
+ 
+ EXTRA_DIST = headers.h localdecls.h ChangeLog.0
+ 
+diff --git a/configure.ac b/configure.ac
+index 661b494..ca0d3ac 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -26,7 +26,7 @@ AC_ISC_POSIX
+ AC_USE_SYSTEM_EXTENSIONS
+ 
+ dnl Checks for programs.
+-AM_PROG_AR
++#AM_PROG_AR
+ AC_PROG_INSTALL
+ AC_PROG_MAKE_SET
+ AC_PROG_AWK
+@@ -38,6 +38,14 @@ LT_INIT([disable-static])
+ 
+ AC_PREFIX_DEFAULT([/usr])
+ 
++dnl allow pch to be controlled
++AC_MSG_CHECKING([whether to use pre-compiled sandbox headers])
++AC_ARG_ENABLE([pch],
++	[AS_HELP_STRING([--disable-pch],[Disable pre-compiled headers])],
++	[],[enable_pch="yes"])
++AM_CONDITIONAL([SB_BUILD_PCH], test "$enable_pch" = "yes")
++AC_MSG_RESULT($enable_pch)
++
+ dnl multiple personality support (x86 & x86_64: multilib)
+ AC_MSG_CHECKING([for multiple personalities])
+ AC_ARG_ENABLE([schizo],
+

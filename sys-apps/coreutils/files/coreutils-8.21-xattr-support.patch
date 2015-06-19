@@ -1,0 +1,70 @@
+From: Anthony G. Basile <blueness@gentoo.org>
+
+Preserve extended attributes by default when doing cp, mv or
+install when built with --enable-xattr.
+
+diff --git a/src/cp.c b/src/cp.c
+index e235b32..2bab87f 100644
+--- a/src/cp.c
++++ b/src/cp.c
+@@ -784,9 +784,14 @@ cp_option_init (struct cp_options *x)
+   x->explicit_no_preserve_mode = false;
+   x->preserve_security_context = false;
+   x->require_preserve_context = false;
++#if USE_XATTR
++  x->preserve_xattr = true;
++  x->require_preserve_xattr = true;
++#else
+   x->preserve_xattr = false;
+-  x->reduce_diagnostics = false;
+   x->require_preserve_xattr = false;
++#endif
++  x->reduce_diagnostics = false;
+ 
+   x->data_copy_required = true;
+   x->require_preserve = false;
+diff --git a/src/install.c b/src/install.c
+index a5ed7a8..03bdac3 100644
+--- a/src/install.c
++++ b/src/install.c
+@@ -280,7 +280,13 @@ cp_option_init (struct cp_options *x)
+   x->data_copy_required = true;
+   x->require_preserve = false;
+   x->require_preserve_context = false;
++#if USE_XATTR
++  x->preserve_xattr = true;
++  x->require_preserve_xattr = true;
++#else
++  x->preserve_xattr = false;
+   x->require_preserve_xattr = false;
++#endif
+   x->recursive = false;
+   x->sparse_mode = SPARSE_AUTO;
+   x->symbolic_link = false;
+@@ -296,7 +302,6 @@ cp_option_init (struct cp_options *x)
+   x->open_dangling_dest_symlink = false;
+   x->update = false;
+   x->preserve_security_context = false;
+-  x->preserve_xattr = false;
+   x->verbose = false;
+   x->dest_info = NULL;
+   x->src_info = NULL;
+diff --git a/src/mv.c b/src/mv.c
+index 1cfcd82..b9aec6e 100644
+--- a/src/mv.c
++++ b/src/mv.c
+@@ -124,8 +124,13 @@ cp_option_init (struct cp_options *x)
+   x->data_copy_required = true;
+   x->require_preserve = false;  /* FIXME: maybe make this an option */
+   x->require_preserve_context = false;
++#if USE_XATTR
+   x->preserve_xattr = true;
++  x->require_preserve_xattr = true;
++#else
++  x->preserve_xattr = false;
+   x->require_preserve_xattr = false;
++#endif
+   x->recursive = true;
+   x->sparse_mode = SPARSE_AUTO;  /* FIXME: maybe make this an option */
+   x->symbolic_link = false;
+
