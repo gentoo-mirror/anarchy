@@ -1,6 +1,6 @@
 # Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-tv/kodi/kodi-14.1.ebuild,v 1.7 2015/04/08 18:15:30 mgorny Exp $
+# $Header: $
 
 EAPI="5"
 
@@ -9,7 +9,7 @@ EAPI="5"
 PYTHON_COMPAT=( python2_7 )
 PYTHON_REQ_USE="sqlite"
 
-inherit eutils python-single-r1 multiprocessing autotools
+inherit flag-o-matic eutils python-single-r1 multiprocessing autotools
 
 CODENAME="Helix"
 case ${PV} in
@@ -32,7 +32,7 @@ HOMEPAGE="http://kodi.tv/ http://kodi.wiki/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="airplay avahi bluetooth bluray caps cec css debug +fishbmc gles goom java joystick midi mysql nfs +opengl profile +projectm pulseaudio pvr +rsxs rtmp +samba sdl sftp test +texturepacker udisks upnp upower +usb vaapi vdpau webserver +X +xrandr"
+IUSE="airplay avahi bluetooth bluray caps cec css debug +fishbmc gles goom hdhomerun java joystick midi mysql nfs +opengl profile +projectm pulseaudio pvr +rsxs rtmp +samba sdl sftp test +texturepacker udisks upnp upower +usb vaapi vdpau webserver +X +xrandr"
 REQUIRED_USE="
 	pvr? ( mysql )
 	rsxs? ( X )
@@ -65,11 +65,11 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	media-libs/fontconfig
 	media-libs/freetype
 	>=media-libs/glew-1.5.6
-	media-libs/jasper
-	media-libs/jbigkit
 	>=media-libs/libass-0.9.7
 	bluray? ( media-libs/libbluray )
 	css? ( media-libs/libdvdcss )
+	media-libs/libdvdread[css?]
+	hdhomerun? ( >=media-libs/libhdhomerun-20140121 )
 	media-libs/libmad
 	media-libs/libmodplug
 	media-libs/libmpeg2
@@ -77,11 +77,15 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	media-libs/libpng
 	projectm? ( media-libs/libprojectm )
 	media-libs/libsamplerate
-	sdl? ( media-libs/libsdl2 )
+	sdl? (
+		media-libs/libsdl2
+		media-libs/sdl-image
+	)
 	>=media-libs/taglib-1.8
 	media-libs/libvorbis
 	media-libs/tiff
 	pulseaudio? ( media-sound/pulseaudio )
+	media-sound/sidplay
 	media-sound/wavpack
 	>=media-video/ffmpeg-2.4:=[encode]
 	rtmp? ( media-video/rtmpdump )
@@ -130,7 +134,6 @@ DEPEND="${COMMON_DEPEND}
 		media-libs/libsdl
 		media-libs/sdl-image
 	)
-	sdl? ( media-libs/sdl-image )
 	X? ( x11-proto/xineramaproto )
 	dev-util/cmake
 	x86? ( dev-lang/nasm )
@@ -150,8 +153,61 @@ src_prepare() {
 	epatch "${FILESDIR}"/${PN}-9999-nomythtv.patch
 	epatch "${FILESDIR}"/${P}-no-arm-flags.patch #400617
 	epatch "${FILESDIR}"/${PN}-14.0-dvddemux-ffmpeg.patch #526992#36
+
+	# Patches snatched from Debian and Fedora
+	epatch "${FILESDIR}"/${P}-privacy.patch
+	epatch "${FILESDIR}"/${P}-use-external-libsidplay.patch
+	epatch "${FILESDIR}"/${P}-use-external-libhdhomerun.patch
+	epatch "${FILESDIR}"/${P}-disable-gtest.patch
+	epatch "${FILESDIR}"/${P}-use-external-dvdread.patch
+	epatch "${FILESDIR}"/${P}-remove-ljbig-and-ljasper.patch
+
 	# The mythtv patch touches configure.ac, so force a regen
 	rm -f configure
+
+	# Snatched from Fedora
+	if ! use hdhomerun; then
+		sed -i configure.in -e '/hdhomerun/d'
+		cd xbmc/filesystem
+		rm HDHomeRunFile.cpp HDHomeRunFile.h
+		rm HDHomeRunDirectory.cpp HDHomeRunDirectory.h
+		sed -i Makefile.in -e '/HDHomeRunFile\.cpp/d'
+		sed -i Makefile.in -e '/HDHomeRunDirectory\.cpp/d'
+		sed -i DirectoryFactory.cpp -e '/HomeRun/d'
+		sed -i FileFactory.cpp -e '/HomeRun/d'
+		cd "${S}"
+	fi
+
+	# Snatched from Debian & Fedora - remove bundled libraries, forces
+	# build system to use external versions
+	rm -r lib/afpfs-ng \
+		lib/cximage-6.0/jasper \
+		lib/cximage-6.0/jbig \
+		lib/cximage-6.0/jpeg \
+		lib/cximage-6.0/mng \
+		lib/cximage-6.0/png \
+		lib/cximage-6.0/tiff \
+		lib/cximage-6.0/zlib \
+		lib/enca \
+		lib/gtest \
+		lib/libUPnP/Neptune/ThirdParty/zlib-* \
+		lib/libbluray \
+		lib/libcec \
+		lib/libhdhomerun \
+		lib/libmicrohttpd \
+		lib/libmodplug \
+		lib/libmpeg2 \
+		lib/librtmp \
+		lib/libsidplay2 \
+		lib/taglib \
+		lib/win32 \
+		project/Win32BuildSetup \
+		xbmc/cores/dvdplayer/DVDCodecs/Video/libmpeg2
+
+	for i in libdvdcss libdvdread includes
+	do
+		rm -r lib/libdvd/$i
+	done
 
 	# some dirs ship generated autotools, some dont
 	multijob_init
@@ -200,6 +256,11 @@ src_configure() {
 	export ac_cv_lib_bluetooth_hci_devid=$(usex bluetooth)
 	# Requiring java is asine #434662
 	[[ ${PV} != "9999" ]] && export ac_cv_path_JAVA_EXE=$(which $(usex java java true))
+
+	# Snatched from Fedora
+	if use hdhomerun; then
+		append-libs -lhdhomerun
+	fi
 
 	econf \
 		--docdir=/usr/share/doc/${PF} \
