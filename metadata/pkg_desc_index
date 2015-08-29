@@ -5,7 +5,6 @@ media-tv/kodi 15.1: Kodi is a free and open source media-player and entertainmen
 net-irc/hexchat 2.10.2: Graphical IRC client based on XChat
 net-libs/libiscsi 1.14.0: iscsi client library and utilities
 sys-apps/coreutils 8.21: Standard GNU file utilities (chmod, cp, dd, dir, ls...), text utilities (sort, tr, head, wc..), and shell utilities (whoami, who,...)
-sys-apps/sandbox 2.6-r1: sandbox'd LD_PRELOAD hack
 sys-auth/polkit 0.110: Policy framework for controlling privileges for system-wide services
 sys-libs/pam 1.1.7: Linux-PAM (Pluggable Authentication Modules)
 sys-process/audit 2.2.2: Userspace utilities for storing and processing auditing records
