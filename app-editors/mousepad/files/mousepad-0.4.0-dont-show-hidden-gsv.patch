@@ -1,0 +1,43 @@
+From 720cf91f7b21864b4d3bb0ce18d96cfa719877ca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Miranda?= <andreldm1989@gmail.com>
+Date: Mon, 6 Jul 2015 19:45:06 -0700
+Subject: Don't show hidden GSV languages
+
+Some like "Defaults" aren't meant to be exposed to users and can
+even cause crashes. Closes bug #12043.
+
+diff --git a/mousepad/mousepad-action-group.c b/mousepad/mousepad-action-group.c
+index 156ebbb..71b37f2 100644
+--- a/mousepad/mousepad-action-group.c
++++ b/mousepad/mousepad-action-group.c
+@@ -617,6 +617,13 @@ mousepad_action_group_get_sorted_section_names (void)
+       language = gtk_source_language_manager_get_language (manager, *languages);
+       if (G_LIKELY (GTK_SOURCE_IS_LANGUAGE (language)))
+         {
++          /* ignore hidden languages */
++          if(gtk_source_language_get_hidden(language))
++            {
++              languages++;
++              continue;
++            }
++
+           /* ensure no duplicates in list */
+           if (!g_slist_find_custom (list,
+                                     gtk_source_language_get_section (language),
+@@ -651,6 +658,13 @@ mousepad_action_group_get_sorted_languages_for_section (const gchar *section)
+       language = gtk_source_language_manager_get_language (manager, *languages);
+       if (G_LIKELY (GTK_SOURCE_IS_LANGUAGE (language)))
+         {
++          /* ignore hidden languages */
++          if(gtk_source_language_get_hidden(language))
++            {
++              languages++;
++              continue;
++            }
++
+           /* only get languages in the specified section */
+           if (g_strcmp0 (gtk_source_language_get_section (language), section) == 0)
+             list = g_slist_prepend (list, language);
+-- 
+cgit v0.10.1
+
