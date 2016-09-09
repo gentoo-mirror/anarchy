@@ -18,11 +18,12 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
+	dev-python/alembic[${PYTHON_USEDEP}]
 	dev-python/beautifulsoup:4[${PYTHON_USEDEP}]
 	dev-python/chardet[${PYTHON_USEDEP}]
 	dev-python/lxml[${PYTHON_USEDEP}]
 	dev-python/mako[${PYTHON_USEDEP}]
-	>=dev-python/pyenchant-1.3[${PYTHON_USEDEP}]
+	>=dev-python/pyenchant-1.3[${PYTHON_USEDEP}]	
 	dev-python/pyodbc
 	dev-python/PyQt5[multimedia,gui,network,svg,webkit,${PYTHON_USEDEP}]
 	dev-python/setuptools[${PYTHON_USEDEP}]
@@ -38,6 +39,6 @@ PATCHES=( "${FILESDIR}"/OpenLP-${PV}-disable-tests.patch )
 python_install_all() {
 	distutils-r1_python_install_all
 	domenu  resources/openlp.desktop
-	dosym  openlp.py /usr/bin/openlp
+	mv   ${D}/usr/bin/openlp.py ${D}/usr/bin/openlp
 	doicon -s scalable resources/images/openlp.svg
 }
