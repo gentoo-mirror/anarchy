@@ -145,6 +145,7 @@ src_prepare() {
 	DOC_CONTENTS="To modify system network connections without needing to enter the
 		root password, add your user account to the 'plugdev' group."
 
+	eapply "${FILESDIR}"/0001-Support-musl-libc.patch
 	use vala && vala_src_prepare
 	gnome2_src_prepare
 }
