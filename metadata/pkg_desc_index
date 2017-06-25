@@ -4,3 +4,4 @@ dev-embedded/u-boot-tools 2016.01: utilities for working with Das U-Boot
 media-video/vlc 2.2.4: VLC media player - Video player and streamer
 net-libs/webkit-gtk 2.8.5: Open source web browser engine
 net-misc/networkmanager 1.8.0: A set of co-operative tools that make networking simple and straightforward
+sys-apps/iucode_tool 2.1.2: tool to manipulate Intel X86 and X86-64 processor microcode update collections
