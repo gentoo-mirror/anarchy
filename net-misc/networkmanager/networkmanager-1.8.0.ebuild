@@ -3,8 +3,8 @@
 
 EAPI=6
 GNOME_ORG_MODULE="NetworkManager"
-GNOME2_LA_PUNT="yes"
 GNOME2_EAUTORECONF="yes"
+GNOME2_LA_PUNT="yes"
 VALA_USE_DEPEND="vapigen"
 PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6} )
 
@@ -38,7 +38,7 @@ COMMON_DEPEND="
 	>=dev-libs/glib-2.37.6:2[${MULTILIB_USEDEP}]
 	>=dev-libs/libnl-3.2.8:3=[${MULTILIB_USEDEP}]
 	policykit? ( >=sys-auth/polkit-0.106 )
-	net-libs/libndp
+	net-libs/libndp[${MULTILIB_USEDEP}]
 	net-misc/curl
 	net-misc/iputils
 	sys-apps/util-linux[${MULTILIB_USEDEP}]
@@ -94,6 +94,10 @@ DEPEND="${COMMON_DEPEND}
 	)
 "
 
+PATCHES=(
+	"${FILESDIR}"/0001-Support-musl-libc.patch
+)
+
 python_check_deps() {
 	if use introspection; then
 		has_version "dev-python/pygobject:3[${PYTHON_USEDEP}]" || return
@@ -145,7 +149,6 @@ src_prepare() {
 	DOC_CONTENTS="To modify system network connections without needing to enter the
 		root password, add your user account to the 'plugdev' group."
 
-	eapply "${FILESDIR}"/0001-Support-musl-libc.patch
 	use vala && vala_src_prepare
 	gnome2_src_prepare
 }
