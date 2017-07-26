@@ -3,8 +3,8 @@
 
 EAPI=6
 GNOME_ORG_MODULE="NetworkManager"
-GNOME2_EAUTORECONF="yes"
 GNOME2_LA_PUNT="yes"
+GNOME2_EAUTORECONF="yes"
 VALA_USE_DEPEND="vapigen"
 PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6} )
 
@@ -72,6 +72,10 @@ COMMON_DEPEND="
 	)
 "
 RDEPEND="${COMMON_DEPEND}
+	|| (
+		net-misc/iputils[arping(+)]
+		net-analyzer/arping
+	)
 	wifi? ( >=net-wireless/wpa_supplicant-0.7.3-r3[dbus] )
 "
 DEPEND="${COMMON_DEPEND}
@@ -97,6 +101,7 @@ DEPEND="${COMMON_DEPEND}
 PATCHES=(
 	"${FILESDIR}"/0001-Support-musl-libc.patch
 )
+
 
 python_check_deps() {
 	if use introspection; then
