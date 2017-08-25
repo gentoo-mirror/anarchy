@@ -8,7 +8,7 @@ GNOME2_EAUTORECONF="yes"
 VALA_USE_DEPEND="vapigen"
 PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6} )
 
-inherit bash-completion-r1 gnome2 linux-info multilib python-any-r1 systemd \
+inherit bash-completion-r1 gnome2 linux-info multilib python-any-r1 systemd  flag-o-matic \
 	user readme.gentoo-r1 toolchain-funcs vala versionator virtualx udev multilib-minimal
 
 DESCRIPTION="A set of co-operative tools that make networking simple and straightforward"
@@ -17,7 +17,8 @@ HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
 LICENSE="GPL-2+"
 SLOT="0" # add subslot if libnm-util.so.2 or libnm-glib.so.4 bumps soname version
 
-IUSE="audit bluetooth connection-sharing consolekit +dhclient dhcpcd elogind gnutls +introspection json kernel_linux +nss +modemmanager ncurses ofono policykit +ppp resolvconf selinux systemd teamd test vala +wext +wifi"
+IUSE="audit bluetooth connection-sharing consolekit +dhclient dhcpcd elibc_musl elogind gnutls +introspection
+ json kernel_linux +nss +modemmanager ncurses ofono policykit +ppp resolvconf selinux systemd teamd test vala +wext +wifi"
 
 REQUIRED_USE="
 	modemmanager? ( ppp )
@@ -102,7 +103,6 @@ PATCHES=(
 	"${FILESDIR}"/0001-Support-musl-libc.patch
 )
 
-
 python_check_deps() {
 	if use introspection; then
 		has_version "dev-python/pygobject:3[${PYTHON_USEDEP}]" || return
@@ -159,6 +159,8 @@ src_prepare() {
 }
 
 multilib_src_configure() {
+	use elibc_musl && append-cflags -DHAVE_SECURE_GETENV -Dsecure_getenv=getenv -D__USE_POSIX199309
+
 	local myconf=(
 		--disable-more-warnings
 		--disable-static
