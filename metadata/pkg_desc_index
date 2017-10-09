@@ -4,5 +4,5 @@ dev-embedded/u-boot-tools 2016.01: utilities for working with Das U-Boot
 media-video/vlc 2.2.4: VLC media player - Video player and streamer
 net-libs/webkit-gtk 2.8.5: Open source web browser engine
 sys-apps/iucode_tool 2.1.2: tool to manipulate Intel X86 and X86-64 processor microcode update collections
-sys-kernel/hardened-sources 4.9.52: Hardened kernel sources (kernel series 4.9)
+sys-kernel/hardened-sources 4.9.54: Hardened kernel sources (kernel series 4.9)
 virtual/rust 1.20: Virtual for Rust language compiler
