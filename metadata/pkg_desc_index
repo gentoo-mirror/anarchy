@@ -1,6 +1,7 @@
 app-editors/mousepad 0.4.0: GTK+-based editor for the Xfce Desktop Environment
 app-text/openlp 2.4.2: Free church presentation software
 dev-embedded/u-boot-tools 2016.01: utilities for working with Das U-Boot
+dev-python/m2crypto 0.27.0: M2Crypto: A Python crypto and SSL toolkit
 dev-util/cargo 0.21.1: The Rust's package manager
 media-video/vlc 2.2.4: VLC media player - Video player and streamer
 net-libs/webkit-gtk 2.8.5: Open source web browser engine
