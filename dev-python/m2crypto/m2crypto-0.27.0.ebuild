@@ -32,6 +32,8 @@ DEPEND="${RDEPEND}
 
 S="${WORKDIR}/${MY_PN}-${PV}"
 
+PATCHES=( "${FILESDIR}/${P}-libressl.patch" )
+
 # Tests access network, and fail randomly. Bug #431458.
 RESTRICT=test
 
