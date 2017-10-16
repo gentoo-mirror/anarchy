@@ -17,7 +17,6 @@ bufstream-0.1.3
 cc-1.0.0
 cfg-if-0.1.2
 cmake-0.1.24
-crates-io-0.10.0
 crossbeam-0.2.10
 curl-0.4.7
 curl-sys-0.3.14
@@ -125,56 +124,37 @@ LICENSE="|| ( MIT Apache-2.0 )"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~x86"
 
-IUSE="bash-completion doc libressl static"
+IUSE="doc libressl"
 
-DEPEND="
-    static? (
-		libressl? ( >=dev-libs/libressl-2.6.0[static-libs] )
-		!libressl? ( dev-libs/openssl[static-libs] )
-		net-libs/http-parser[static-libs]
-        net-libs/libssh2[static-libs]
-        net-misc/curl[ssl,static-libs]
-		sys-libs/zlib[static-libs]
-    )
-    !static? (
-		libressl? ( >dev-libs/libressl-2.6.0 )
-		!libressl? ( dev-libs/openssl )
-		net-libs/http-parser
-        net-libs/libssh2
-        net-misc/curl[ssl]
-		sys-libs/zlib
-    )
+COMMON_DEPEND="sys-libs/zlib
+	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:0= )
+	net-libs/libssh2
+	net-libs/http-parser"
+RDEPEND="${COMMON_DEPEND}
+	!dev-util/cargo-bin
+	net-misc/curl[ssl]"
+DEPEND="${COMMON_DEPEND}
+	>=virtual/rust-1.19.0
 	dev-util/cmake
 	sys-apps/coreutils
 	sys-apps/diffutils
 	sys-apps/findutils
-	sys-apps/sed
-	>=virtual/rust-1.9.0
-"
-RDEPEND="
-	!dev-util/cargo-bin
-    !static? (
-		libressl? ( >=dev-libs/libressl-2.6.0:0= )
-		!libressl? ( dev-libs/openssl:0= )
-		net-libs/http-parser:=
-        net-libs/libssh2:=
-        net-misc/curl:=[ssl]
-		sys-libs/zlib:=
-    )
-"
+	sys-apps/sed"
 
 PATCHES=( "${FILESDIR}/${P}-libressl-2.6.2.patch" )
 
-src_prepare() {
-	default
+src_configure() {
+	# Do nothing
+	echo "Configuring cargo..."
 }
 
 src_compile() {
 	export CARGO_HOME="${ECARGO_HOME}"
-	local cargo="/usr/bin/cargo"
-	${cargo} build --release || die
+	local cargo="${WORKDIR}/cargo-${BOOTSTRAP_VERSION}-${TRIPLE}/cargo/bin/cargo"
+	RUSTFLAGS='-C target-feature=-crt-static' ${cargo}  build  --release || die "Failed to build cargo"
 
-	# Build HTML documentation
+	# Building HTML documentation
 	use doc && ${cargo} doc
 }
 
@@ -185,7 +165,7 @@ src_install() {
 	use doc && HTML_DOCS=("target/doc")
 	einstalldocs
 
-	use bash-completion && newbashcomp src/etc/cargo.bashcomp.sh cargo
+	newbashcomp src/etc/cargo.bashcomp.sh cargo
 	insinto /usr/share/zsh/site-functions
 	doins src/etc/_cargo
 	doman src/etc/man/*
