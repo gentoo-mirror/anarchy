@@ -125,13 +125,47 @@ ws2_32-sys-0.2.1
 
 inherit bash-completion-r1 cargo versionator
 
+case "${CHOST}" in
+	armv7a-hardfloat-*)
+		CARGOARCH=armv7 ;;
+	arm*)
+		CARGOARCH=arm ;;
+	*)
+		CARGOARCH=${CHOST%%-*} ;;
+esac
+case "${CHOST}" in
+	armv7a-hardfloat-*)
+		CARGOLIBC=${ELIBC/glibc/gnu}eabihf ;;
+	arm*)
+		CARGOLIBC=${ELIBC/glibc/gnu}eabi ;;
+	*)
+		CARGOLIBC=${ELIBC/glibc/gnu} ;;
+esac
+CARGOHOST=${CARGOARCH}-unknown-${KERNEL}-${CARGOLIBC}
 CARGO_SNAPSHOT_VERSION="0.$(($(get_version_component_range 2) - 1)).0"
-CTARGET=${CHOST/gentoo/unknown}
 
 DESCRIPTION="The Rust's package manager"
 HOMEPAGE="http://crates.io"
+
 SRC_URI="https://github.com/rust-lang/cargo/archive/${PV}.tar.gz -> ${P}.tar.gz
-	http://portage.smaeul.xyz/distfiles/cargo-${CARGO_SNAPSHOT_VERSION}-${CTARGET}.tar.xz
+	amd64? (
+		elibc_glibc? ( https://static.rust-lang.org/dist/cargo-${CARGO_SNAPSHOT_VERSION}-x86_64-unknown-linux-gnu.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/cargo-${CARGO_SNAPSHOT_VERSION}-x86_64-unknown-linux-musl.tar.xz )
+	)
+	arm? (
+		elibc_glibc? (
+			https://static.rust-lang.org/dist/cargo-${CARGO_SNAPSHOT_VERSION}-arm-unknown-linux-gnueabi.tar.xz
+			https://static.rust-lang.org/dist/cargo-${CARGO_SNAPSHOT_VERSION}-armv7-unknown-linux-gnueabihf.tar.xz
+		)
+		elibc_musl? (
+			https://portage.smaeul.xyz/distfiles/cargo-${CARGO_SNAPSHOT_VERSION}-arm-unknown-linux-musleabi.tar.xz
+			https://portage.smaeul.xyz/distfiles/cargo-${CARGO_SNAPSHOT_VERSION}-armv7-unknown-linux-musleabihf.tar.xz
+		)
+	)
+	x86? (
+		elibc_glibc? ( https://static.rust-lang.org/dist/cargo-${CARGO_SNAPSHOT_VERSION}-i686-unknown-linux-gnu.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/cargo-${CARGO_SNAPSHOT_VERSION}-i686-unknown-linux-musl.tar.xz )
+	)
 	$(cargo_crate_uris ${CRATES})"
 
 RESTRICT="mirror"
@@ -139,37 +173,52 @@ LICENSE="|| ( MIT Apache-2.0 )"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~x86"
 
-IUSE="doc libressl"
+IUSE="bash-completion doc libressl static"
 
-COMMON_DEPEND="sys-libs/zlib
-	!libressl? ( dev-libs/openssl:0= )
-	libressl? ( dev-libs/libressl:0= )
-	net-libs/libssh2
-	net-libs/http-parser"
-RDEPEND="${COMMON_DEPEND}
-	!dev-util/cargo-bin
-	net-misc/curl[ssl]"
-DEPEND="${COMMON_DEPEND}
-	>=virtual/rust-1.19.0
+DEPEND="
+    static? (
+		libressl? ( dev-libs/libressl[static-libs] )
+		!libressl? ( dev-libs/openssl[static-libs] )
+		net-libs/http-parser[static-libs]
+        net-libs/libssh2[static-libs]
+        net-misc/curl[ssl,static-libs]
+		sys-libs/zlib[static-libs]
+    )
+    !static? (
+		libressl? ( dev-libs/libressl )
+		!libressl? ( dev-libs/openssl )
+		net-libs/http-parser
+        net-libs/libssh2
+        net-misc/curl[ssl]
+		sys-libs/zlib
+    )
 	dev-util/cmake
 	sys-apps/coreutils
 	sys-apps/diffutils
 	sys-apps/findutils
-	sys-apps/sed"
+	sys-apps/sed
+	>=virtual/rust-1.9.0
+"
+RDEPEND="
+	!dev-util/cargo-bin
+    !static? (
+		libressl? ( dev-libs/libressl:0= )
+		!libressl? ( dev-libs/openssl:0= )
+		net-libs/http-parser:=
+        net-libs/libssh2:=
+        net-misc/curl:=[ssl]
+		sys-libs/zlib:=
+    )
+"
 
 PATCHES=( "${FILESDIR}/${P}-libressl-2.6.2.patch" )
 
-src_configure() {
-	# Do nothing
-	echo "Configuring cargo..."
-}
-
 src_compile() {
 	export CARGO_HOME="${ECARGO_HOME}"
-	local cargo="/usr/bin/cargo"
-	RUSTFLAGS='-C target-feature=-crt-static' ${cargo}  build  --release || die "Failed to build cargo"
+	local cargo="${WORKDIR}/cargo-${CARGO_SNAPSHOT_VERSION}-${CARGOHOST}/cargo/bin/cargo"
+	RUSTFLAGS='-C target-feature=-crt-static' ${cargo} build --release || die
 
-	# Building HTML documentation
+	# Build HTML documentation
 	use doc && ${cargo} doc
 }
 
@@ -180,7 +229,7 @@ src_install() {
 	use doc && HTML_DOCS=("target/doc")
 	einstalldocs
 
-	newbashcomp src/etc/cargo.bashcomp.sh cargo
+	use bash-completion && newbashcomp src/etc/cargo.bashcomp.sh cargo
 	insinto /usr/share/zsh/site-functions
 	doins src/etc/_cargo
 	doman src/etc/man/*
