@@ -1,0 +1,40 @@
+From af25d1cb9c009d66a536e6bbd5f997c71e6592a7 Mon Sep 17 00:00:00 2001
+From: "Jory A. Pratt" <anarchy@gentoo.org>
+Date: Mon, 11 Jun 2018 04:11:20 -0500
+Subject: [PATCH 3/3] fix includes for musl system
+
+Signed-off-by: Jory A. Pratt <anarchy@gentoo.org>
+---
+ sd/source/ui/remotecontrol/BluetoothServer.cxx | 2 +-
+ vcl/inc/headless/svpinst.hxx                   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sd/source/ui/remotecontrol/BluetoothServer.cxx b/sd/source/ui/remotecontrol/BluetoothServer.cxx
+index 780224719..c938afe48 100644
+--- a/sd/source/ui/remotecontrol/BluetoothServer.cxx
++++ b/sd/source/ui/remotecontrol/BluetoothServer.cxx
+@@ -21,7 +21,7 @@
+   #include <dbus/dbus.h>
+   #include <errno.h>
+   #include <fcntl.h>
+-  #include <sys/unistd.h>
++  #include <unistd.h>
+   #include <sys/socket.h>
+   #include <bluetooth/bluetooth.h>
+   #include <bluetooth/rfcomm.h>
+diff --git a/vcl/inc/headless/svpinst.hxx b/vcl/inc/headless/svpinst.hxx
+index ba8096032..bcb644b84 100644
+--- a/vcl/inc/headless/svpinst.hxx
++++ b/vcl/inc/headless/svpinst.hxx
+@@ -31,7 +31,7 @@
+ 
+ #include <list>
+ 
+-#include <time.h>
++#include <sys/time.h>
+ 
+ #define VIRTUAL_DESKTOP_WIDTH 1024
+ #define VIRTUAL_DESKTOP_HEIGHT 768
+-- 
+2.17.1
+
