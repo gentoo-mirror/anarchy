@@ -1,0 +1,54 @@
+From 22e97095b30583eae81b55cd83e3ab8b944faaad Mon Sep 17 00:00:00 2001
+From: "Jory A. Pratt" <anarchy@gentoo.org>
+Date: Mon, 11 Jun 2018 04:10:23 -0500
+Subject: [PATCH 2/3] execinfo header not needed on musl setup
+
+Signed-off-by: Jory A. Pratt <anarchy@gentoo.org>
+---
+ sal/osl/unx/backtrace.c | 2 +-
+ sal/osl/unx/backtrace.h | 2 +-
+ sal/osl/unx/signal.cxx  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/sal/osl/unx/backtrace.c b/sal/osl/unx/backtrace.c
+index f70031d0b..141ea4e06 100644
+--- a/sal/osl/unx/backtrace.c
++++ b/sal/osl/unx/backtrace.c
+@@ -282,7 +282,7 @@ void backtrace_symbols_fd( void **buffer, int size, int fd )
+     }
+ }
+ 
+-#elif !defined LINUX
++#elif !defined(__GLIBC__)
+ 
+ int backtrace( void **buffer, int max_frames )
+ {
+diff --git a/sal/osl/unx/backtrace.h b/sal/osl/unx/backtrace.h
+index 5fafc1c90..408c12c69 100644
+--- a/sal/osl/unx/backtrace.h
++++ b/sal/osl/unx/backtrace.h
+@@ -20,7 +20,7 @@
+ #ifndef INCLUDED_SAL_OSL_UNX_BACKTRACE_H
+ #define INCLUDED_SAL_OSL_UNX_BACKTRACE_H
+ 
+-#if defined (LINUX)
++#if defined (LINUX) && defined (__GLIBC__)
+ 
+ #include <execinfo.h>
+ 
+diff --git a/sal/osl/unx/signal.cxx b/sal/osl/unx/signal.cxx
+index 9a528fec3..bf15f628f 100644
+--- a/sal/osl/unx/signal.cxx
++++ b/sal/osl/unx/signal.cxx
+@@ -35,7 +35,7 @@
+ 
+ #endif /* MACOSX */
+ 
+-#ifdef LINUX
++#if defined(LINUX) && defined(__GLIBC__)
+ #include <execinfo.h>
+ #include <link.h>
+ #define INCLUDE_BACKTRACE
+-- 
+2.17.1
+
