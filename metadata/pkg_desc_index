@@ -1,4 +1,4 @@
 app-editors/mousepad 0.4.0-r1: GTK+-based editor for the Xfce Desktop Environment
 media-video/vlc 2.2.4: VLC media player - Video player and streamer
-net-libs/webkit-gtk 2.8.5: Open source web browser engine
+net-wireless/lorcon 0.0_p20150109: A generic library for injecting 802.11 frames
 sys-boot/syslinux 6.04_pre1: SYSLINUX, PXELINUX, ISOLINUX, EXTLINUX and MEMDISK bootloaders
