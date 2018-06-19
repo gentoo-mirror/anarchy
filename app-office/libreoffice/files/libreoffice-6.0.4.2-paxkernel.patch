@@ -1,0 +1,27 @@
+From 006997df0a39feee276dfcf11dad4140d8910167 Mon Sep 17 00:00:00 2001
+From: "Jory A. Pratt" <anarchy@gentoo.org>
+Date: Tue, 19 Jun 2018 18:41:07 -0500
+Subject: [PATCH] disable mprotect on gengal for pax kernel
+
+Signed-off-by: Jory A. Pratt <anarchy@gentoo.org>
+---
+ solenv/gbuild/Gallery.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/solenv/gbuild/Gallery.mk b/solenv/gbuild/Gallery.mk
+index d08fe69ae..5082ca740 100644
+--- a/solenv/gbuild/Gallery.mk
++++ b/solenv/gbuild/Gallery.mk
+@@ -55,7 +55,8 @@ $(dir $(call gb_Gallery_get_target,$(1)))%/.dir :
+ 
+ $(call gb_Gallery_get_target,%) : \
+ 		$(call gb_Executable_get_runtime_dependencies,gengal)
+-	$(call gb_Gallery__command,$@,$*)
++	paxctl-ng -m $(call gb_Executable_get_target_for_build,gengal) \
++		$(call gb_Gallery__command,$@,$*)
+ 
+ $(call gb_Gallery__get_final_target,%) :
+ 	touch $@
+-- 
+2.17.1
+

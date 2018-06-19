@@ -259,6 +259,9 @@ PATCHES=(
 	"${FILESDIR}/fix-execinfo.patch"
 	"${FILESDIR}/fix-includes.patch"
 
+	# Only to be applied on pax enabled kernels
+	"${FILESDIR}/${PN}-6.0.4.2-paxkernel.patch"
+
 	# gtk3-kde5 vcl plugin backported from master
 	"${WORKDIR}"/${PATCHSET/.tar.xz/}
 )
