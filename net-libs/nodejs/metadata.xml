@@ -5,6 +5,7 @@
 		<email>jer@gentoo.org</email>
 	</maintainer>
 	<use>
+		<flag name="bundled-ssl">Use bundled ssl on libressl</flag>
 		<flag name="inspector">Enable V8 inspector</flag>
 		<flag name="npm">Enable NPM package manager</flag>
 		<flag name="snapshot">Enable snapshot creation for faster startup</flag>
