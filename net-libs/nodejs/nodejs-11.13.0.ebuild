@@ -15,7 +15,7 @@ SRC_URI="https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz"
 LICENSE="Apache-1.1 Apache-2.0 BSD BSD-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86 ~amd64-linux ~x64-macos"
-IUSE="cpu_flags_x86_sse2 debug doc icu inspector libressl +npm +snapshot +ssl systemtap test"
+IUSE="bundled-ssl cpu_flags_x86_sse2 debug doc icu inspector +npm +snapshot +ssl systemtap test"
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	inspector? ( icu ssl )
@@ -30,8 +30,7 @@ RDEPEND="
 	sys-libs/zlib
 	icu? ( >=dev-libs/icu-63.1:= )
 	ssl? (
-	    !libressl? ( >=dev-libs/openssl-1.1.0:0= )
-	    libressl? ( dev-libs/libressl:0= )
+		!bundled-ssl? ( =dev-libs/openssl-1.1.0*:0= )
 	)
 "
 DEPEND="
@@ -106,7 +105,7 @@ src_configure() {
 	use inspector || myconf+=( --without-inspector )
 	use npm || myconf+=( --without-npm )
 	use snapshot || myconf+=( --without-snapshot )
-	use ssl && myconf+=( --shared-openssl ) || myconf+=( --without-ssl )
+	use ssl && ( use bundled-ssl || myconf+=( --shared-openssl ) ) || myconf+=( --without-ssl )
 
 	local myarch=""
 	case ${ABI} in

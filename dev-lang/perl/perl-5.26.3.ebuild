@@ -476,7 +476,7 @@ src_configure() {
 
 		# Use all host paths that might contain useful stuff, the hook above will filter out bad choices.
 		local paths="/lib/*-linux-gnu /usr/lib/*-linux-gnu /lib64 /lib/64 /usr/lib64 /usr/lib/64 /lib32 /usr/lib32 /lib /usr/lib"
-		myconf "-Dlibpth=${EPREFIX}/$(get_libdir) ${EPREFIX}/usr/$(get_libdir) ${paths}"
+		myconf "-Dlibpth="${EPREFIX}"/$(get_libdir) "${EPREFIX}"/usr/$(get_libdir) ${paths}"
 	elif [[ $(get_libdir) != "lib" ]] ; then
 		# We need to use " and not ', as the written config.sh use ' ...
 		myconf "-Dlibpth=/usr/local/$(get_libdir) /$(get_libdir) /usr/$(get_libdir)"
