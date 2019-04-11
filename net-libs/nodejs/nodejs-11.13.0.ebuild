@@ -15,7 +15,7 @@ SRC_URI="https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz"
 LICENSE="Apache-1.1 Apache-2.0 BSD BSD-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86 ~amd64-linux ~x64-macos"
-IUSE="cpu_flags_x86_sse2 debug doc icu inspector libressl +npm +snapshot +ssl systemtap test"
+IUSE="cpu_flags_x86_sse2 debug doc icu inspector +npm +snapshot +ssl systemtap test"
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	inspector? ( icu ssl )
@@ -29,10 +29,7 @@ RDEPEND="
 	>=net-libs/nghttp2-1.34.0
 	sys-libs/zlib
 	icu? ( >=dev-libs/icu-63.1:= )
-	ssl? (
-	    !libressl? ( >=dev-libs/openssl-1.1.0:0= )
-	    libressl? ( dev-libs/libressl:0= )
-	)
+	ssl? ( >=dev-libs/openssl-1.1:0= )
 "
 DEPEND="
 	${RDEPEND}
