@@ -15,10 +15,12 @@ SRC_URI="https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz"
 LICENSE="Apache-1.1 Apache-2.0 BSD BSD-2 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86 ~amd64-linux ~x64-macos"
-IUSE="bundled-ssl cpu_flags_x86_sse2 debug doc icu inspector +npm +snapshot +ssl systemtap test"
+IUSE="bundled-ssl cpu_flags_x86_sse2 debug doc icu inspector libressl +npm +snapshot +ssl systemtap test"
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
+	bundled-ssl? ( ssl )
 	inspector? ( icu ssl )
+	libressl? ( bundled-ssl )
 	npm? ( ssl )
 "
 
@@ -26,11 +28,11 @@ RDEPEND="
 	>=dev-libs/libuv-1.27.0:=
 	>=net-dns/c-ares-1.15.0
 	>=net-libs/http-parser-2.9.0:=
-	>=net-libs/nghttp2-1.34.0
+	>=net-libs/nghttp2-1.37.0
 	sys-libs/zlib
 	icu? ( >=dev-libs/icu-63.1:= )
 	ssl? (
-		!bundled-ssl? ( =dev-libs/openssl-1.1.0*:0= )
+		!bundled-ssl? ( >=dev-libs/openssl-1.1:0= )
 	)
 "
 DEPEND="
