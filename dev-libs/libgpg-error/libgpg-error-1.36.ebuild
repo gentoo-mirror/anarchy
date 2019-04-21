@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -30,8 +30,7 @@ PATCHES=( "${FILESDIR}/${PN}-1.36-gawk5-support.patch" )
 
 src_prepare() {
 	default
-	eautomake
-	elibtoolize
+	eautoreconf
 }
 
 multilib_src_configure() {
