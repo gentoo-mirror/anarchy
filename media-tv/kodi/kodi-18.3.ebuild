@@ -15,7 +15,7 @@ SRC_URI="https://github.com/xbmc/libdvdcss/archive/${LIBDVDCSS_VERSION}.tar.gz -
 	https://github.com/xbmc/libdvdread/archive/${LIBDVDREAD_VERSION}.tar.gz -> libdvdread-${LIBDVDREAD_VERSION}.tar.gz
 	https://github.com/xbmc/libdvdnav/archive/${LIBDVDNAV_VERSION}.tar.gz -> libdvdnav-${LIBDVDNAV_VERSION}.tar.gz
 	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz )
-	!java? ( https://dev.gentoo.org/~anarchy/patches/${P}-no-java-required.patch )"
+	!java? ( https://dev.gentoo.org/~anarchy/patches/${PN}-18.2-no-java-required.patch )"
 
 if [[ ${PV} == *9999 ]] ; then
 	PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
@@ -188,7 +188,7 @@ src_unpack() {
 
 src_prepare() {
 	if in_iuse java && use !java; then
-		eapply "${DISTDIR}"/${P}-no-java-required.patch
+		eapply "${DISTDIR}"/${PN}-18.2-no-java-required.patch
 	fi
 	cmake-utils_src_prepare
 
