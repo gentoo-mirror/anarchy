@@ -77,7 +77,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dev-python/pillow[${PYTHON_USEDEP}]
 	$(python_gen_cond_dep 'dev-python/pycryptodome[${PYTHON_USEDEP}]' 'python3*')
 	>=dev-libs/libcdio-0.94
-	dev-libs/libfmt
+	>=dev-libs/libfmt-3.0.1
 	dev-libs/libfstrcmp
 	gbm? (	media-libs/mesa[gbm] )
 	gles? ( media-libs/mesa[gles2] )
