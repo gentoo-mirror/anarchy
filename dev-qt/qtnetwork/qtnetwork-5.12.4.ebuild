@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 QT5_MODULE="qtbase"
 inherit qt5-build
 
@@ -32,6 +32,7 @@ RDEPEND="${DEPEND}
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-5.12.1-libressl.patch
+	"${FILESDIR}"/${PN}-5.12.4-libressl.patch
 )
 
 QT5_TARGET_SUBDIRS=(
