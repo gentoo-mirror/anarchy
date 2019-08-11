@@ -2,3 +2,29 @@
 # Please add your descriptions to your package's metadata.xml ONLY.
 # * generated automatically using pmaint *
 
+dev-qt/qtnetwork:bindist - Disable EC support via dev-libs/openssl
+dev-qt/qtnetwork:connman - Enable net-misc/connman-based bearer plugin
+dev-qt/qtnetwork:libproxy - Use net-libs/libproxy for automatic HTTP/SOCKS proxy configuration
+dev-qt/qtnetwork:networkmanager - Enable net-misc/networkmanager-based bearer plugin
+media-tv/kodi:airplay - enable AirPlay support
+media-tv/kodi:bluray - Enable playback of Blu-ray filesystems
+media-tv/kodi:cec - Enable support for HDMI-CEC devices via libcec
+media-tv/kodi:dvd - Enable optical (CD/DVD drive) support
+media-tv/kodi:gbm - Use the Graphics Buffer Manager for EGL on KMS.
+media-tv/kodi:gles - Enable support for GLES
+media-tv/kodi:libusb - Use virtual/libusb for usb device hotplug support. This flag should only be enabled if you're running a non-Linux kernel or you don't want to use sys-fs/udev.
+media-tv/kodi:lirc - Enable support for controlling Totem with a remote control using app-misc/lirc
+media-tv/kodi:mariadb - Add MariaDB support
+media-tv/kodi:nfs - Enable NFS client support
+media-tv/kodi:system-ffmpeg - Use system ffmpeg instead of the bundled one
+media-tv/kodi:udev - Use sys-fs/udev rules to handle devices' permissions and hotplug support. Unless you know what you're doing do not disable this flag on Linux kernels. This is provided as an option for completeness.
+media-tv/kodi:webserver - Enable internal webserver
+media-tv/kodi:xslt - Enable XSLT support using dev-libs/libxslt
+net-libs/nodejs:bundled-ssl - Use bundled ssl on libressl
+net-libs/nodejs:inspector - Enable V8 inspector
+net-libs/nodejs:npm - Enable NPM package manager
+net-libs/nodejs:snapshot - Enable snapshot creation for faster startup
+net-libs/nodejs:systemtap - Enable SystemTAP/DTrace tracing
+sys-apps/kmod:lzma - Enable support for XZ compressed modules
+sys-apps/kmod:tools - Install module loading/unloading tools.
+sys-apps/kmod:zlib - Enable support for gzipped modules
