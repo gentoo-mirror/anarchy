@@ -1,12 +1,10 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-
+EAPI=7
 PYTHON_COMPAT=( python2_7 )
 PYTHON_REQ_USE="threads"
-
-inherit bash-completion-r1 eutils flag-o-matic pax-utils python-single-r1 toolchain-funcs
+inherit bash-completion-r1 flag-o-matic pax-utils python-any-r1 toolchain-funcs
 
 DESCRIPTION="A JavaScript runtime built on Chrome's V8 JavaScript engine"
 HOMEPAGE="https://nodejs.org/"
@@ -17,7 +15,6 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86 ~amd64-linux ~x64-macos"
 IUSE="bundled-ssl cpu_flags_x86_sse2 debug doc icu inspector libressl +npm +snapshot +ssl systemtap test"
 REQUIRED_USE="
-	${PYTHON_REQUIRED_USE}
 	bundled-ssl? ( ssl )
 	inspector? ( icu ssl )
 	libressl? ( bundled-ssl )
@@ -25,14 +22,14 @@ REQUIRED_USE="
 "
 
 RDEPEND="
-	>=dev-libs/libuv-1.27.0:=
+	>=dev-libs/libuv-1.31.0:=
 	>=net-dns/c-ares-1.15.0
-	>=net-libs/http-parser-2.9.0:=
-	>=net-libs/nghttp2-1.37.0
+	>=net-libs/http-parser-2.8.0:=
+	>=net-libs/nghttp2-1.39.2
 	sys-libs/zlib
-	icu? ( >=dev-libs/icu-63.1:= )
+	icu? ( >=dev-libs/icu-64.2:= )
 	ssl? (
-		!bundled-ssl? ( >=dev-libs/openssl-1.1:0= )
+		!bundled-ssl? ( >=dev-libs/openssl-1.1.1:0= )
 	)
 "
 DEPEND="
@@ -66,7 +63,6 @@ src_prepare() {
 
 	# make sure we use python2.* while using gyp
 	sed -i -e "s/python/${EPYTHON}/" deps/npm/node_modules/node-gyp/gyp/gyp || die
-	sed -i -e "s/|| 'python2'/|| '${EPYTHON}'/" deps/npm/node_modules/node-gyp/lib/configure.js || die
 
 	# less verbose install output (stating the same as portage, basically)
 	sed -i -e "/print/d" tools/install.py || die
@@ -79,7 +75,7 @@ src_prepare() {
 	# Avoid writing a depfile, not useful
 	sed -i -e "/DEPFLAGS =/d" tools/gyp/pylib/gyp/generator/make.py || die
 
-	sed -i -e "/'-O3'/d" common.gypi deps/v8/gypfiles/toolchain.gypi || die
+	sed -i -e "/'-O3'/d" common.gypi node.gypi || die
 
 	# Avoid a test that I've only been able to reproduce from emerge. It doesnt
 	# seem sandbox related either (invoking it from a sandbox works fine).
@@ -106,8 +102,8 @@ src_configure() {
 	use icu && myconf+=( --with-intl=system-icu ) || myconf+=( --with-intl=none )
 	use inspector || myconf+=( --without-inspector )
 	use npm || myconf+=( --without-npm )
-	use snapshot || myconf+=( --without-snapshot )
-	use ssl && ( use bundled-ssl || myconf+=( --shared-openssl ) ) || myconf+=( --without-ssl )
+	use snapshot && myconf+=( --with-snapshot )
+	use ssl && ( use bundled-ssl || myconf+=( --shared-openssl --openssl-use-def-ca-store ) ) || myconf+=( --without-ssl )
 
 	local myarch=""
 	case ${ABI} in
@@ -138,8 +134,9 @@ src_compile() {
 
 src_install() {
 	local LIBDIR="${ED}/usr/$(get_libdir)"
-	emake install DESTDIR="${D}"
-	pax-mark -m "${ED}"usr/bin/node
+	default
+
+	pax-mark -m "${ED}"/usr/bin/node
 
 	# set up a symlink structure that node-gyp expects..
 	dodir /usr/include/node/deps/{v8,uv}
