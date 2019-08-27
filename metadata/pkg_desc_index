@@ -2,7 +2,7 @@ dev-libs/skalibs 2.8.0.0: skarnet.org general-purpose libraries
 dev-qt/qtnetwork 5.12.4: Network abstraction library for the Qt5 framework
 dev-util/utmps 0.0.2.1: skarnet.org implementation of the utmpx.h family of functions
 media-tv/kodi 18.3-r1: A free and open source media-player and entertainment hub
-net-libs/nodejs 12.9.0: A JavaScript runtime built on Chrome's V8 JavaScript engine
+net-libs/nodejs 12.9.1: A JavaScript runtime built on Chrome's V8 JavaScript engine
 sys-apps/iucode_tool 2.1.2: tool to manipulate Intel X86 and X86-64 processor microcode update collections
 sys-apps/kmod 26-r1: library and tools for managing linux kernel modules
 sys-apps/s6 2.8.0.0: skarnet.org's small and secure supervision software suite
