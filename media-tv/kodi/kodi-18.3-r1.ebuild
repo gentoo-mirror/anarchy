@@ -44,6 +44,9 @@ SLOT="0"
 # it is _required_ for USB support. Otherwise they'll disable udev and
 # that's going to be worse.
 IUSE="airplay alsa bluetooth bluray caps cec +css dbus dvd gbm gles java lcms libressl libusb lirc mariadb mysql nfs +opengl pulseaudio samba systemd +system-ffmpeg test +udev udisks upnp upower vaapi vdpau wayland webserver +X +xslt zeroconf"
+
+RESTRICT="!test? ( test )"
+
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	|| ( gles opengl )
@@ -138,7 +141,6 @@ COMMON_DEPEND="${PYTHON_DEPS}
 "
 RDEPEND="${COMMON_DEPEND}
 	lirc? ( app-misc/lirc )
-	!media-tv/xbmc
 	udisks? ( sys-fs/udisks:2 )
 	upower? ( sys-power/upower )
 "
