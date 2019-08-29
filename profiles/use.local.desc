@@ -25,6 +25,3 @@ net-libs/nodejs:inspector - Enable V8 inspector
 net-libs/nodejs:npm - Enable NPM package manager
 net-libs/nodejs:snapshot - Enable snapshot creation for faster startup
 net-libs/nodejs:systemtap - Enable SystemTAP/DTrace tracing
-sys-apps/kmod:lzma - Enable support for XZ compressed modules
-sys-apps/kmod:tools - Install module loading/unloading tools.
-sys-apps/kmod:zlib - Enable support for gzipped modules
