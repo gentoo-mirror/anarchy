@@ -1,6 +1,6 @@
 dev-libs/skalibs 2.8.0.0: skarnet.org general-purpose libraries
 dev-qt/qtnetwork 5.12.4: Network abstraction library for the Qt5 framework
-media-tv/kodi 18.3-r1: A free and open source media-player and entertainment hub
+media-tv/kodi 18.4: A free and open source media-player and entertainment hub
 net-libs/nodejs 12.9.1: A JavaScript runtime built on Chrome's V8 JavaScript engine
 sys-auth/elogind 241.3: The systemd project's logind, extracted to a standalone package
 sys-boot/syslinux 6.04_pre1: SYSLINUX, PXELINUX, ISOLINUX, EXTLINUX and MEMDISK bootloaders
