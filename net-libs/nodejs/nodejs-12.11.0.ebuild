@@ -8,7 +8,10 @@ inherit bash-completion-r1 flag-o-matic pax-utils python-any-r1 toolchain-funcs
 
 DESCRIPTION="A JavaScript runtime built on Chrome's V8 JavaScript engine"
 HOMEPAGE="https://nodejs.org/"
-SRC_URI="https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz"
+SRC_URI="
+	https://dev.gentoo.org/~jer/${P}-test-torque-tq.patch.xz
+	https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz
+"
 
 LICENSE="Apache-1.1 Apache-2.0 BSD BSD-2 MIT"
 SLOT="0"
@@ -41,6 +44,7 @@ DEPEND="
 PATCHES=(
 	"${FILESDIR}"/${PN}-10.3.0-global-npm-config.patch
 	"${FILESDIR}"/${PN}-99999999-llhttp.patch
+	"${WORKDIR}"/${P}-test-torque-tq.patch
 )
 S="${WORKDIR}/node-v${PV}"
 
