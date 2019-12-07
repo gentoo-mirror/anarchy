@@ -3,7 +3,6 @@
 
 EAPI=7
 
-: ${CMAKE_MAKEFILE_GENERATOR:=ninja}
 PYTHON_REQ_USE="libressl?,sqlite,ssl"
 LIBDVDCSS_VERSION="1.4.2-Leia-Beta-5"
 LIBDVDREAD_VERSION="6.0.0-Leia-Alpha-3"
@@ -14,8 +13,19 @@ FFMPEG_KODI_VERSION="18.4"
 SRC_URI="https://github.com/xbmc/libdvdcss/archive/${LIBDVDCSS_VERSION}.tar.gz -> libdvdcss-${LIBDVDCSS_VERSION}.tar.gz
 	https://github.com/xbmc/libdvdread/archive/${LIBDVDREAD_VERSION}.tar.gz -> libdvdread-${LIBDVDREAD_VERSION}.tar.gz
 	https://github.com/xbmc/libdvdnav/archive/${LIBDVDNAV_VERSION}.tar.gz -> libdvdnav-${LIBDVDNAV_VERSION}.tar.gz
-	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz )
-	!java? ( https://dev.gentoo.org/~anarchy/patches/${PN}-18.2-no-java-required.patch )"
+	!java? ( https://dev.gentoo.org/~anarchy/patches/${PN}-18.2-no-java-required.patch )
+	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz )"
+
+PATCHES=(
+	"${FILESDIR}/${P}-cassert.patch"
+	"${FILESDIR}/musl/0001-add-missing-stdint.h.patch"
+	"${FILESDIR}/musl/0002-fix-fileemu.patch"
+	"${FILESDIR}/musl/0003_use_stdint_for_musl.patch"
+	"${FILESDIR}/musl/0004-Fix-ldt-for-musl.patch"
+	"${FILESDIR}/musl/0005-fix-fortify-sources.patch"
+	"${FILESDIR}/musl/0006-remove-filewrap.patch"
+	"${FILESDIR}/musl/0007-set-default-stacksize-for-musl.patch"
+)
 
 if [[ ${PV} == *9999 ]] ; then
 	PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
@@ -33,7 +43,7 @@ else
 	S=${WORKDIR}/xbmc-${MY_PV}-${CODENAME}
 fi
 
-inherit autotools cmake-utils linux-info pax-utils python-single-r1 xdg-utils
+inherit autotools cmake-utils desktop linux-info pax-utils python-single-r1 xdg
 
 DESCRIPTION="A free and open source media-player and entertainment hub"
 HOMEPAGE="https://kodi.tv/ https://kodi.wiki/"
@@ -43,19 +53,17 @@ SLOT="0"
 # use flag is called libusb so that it doesn't fool people in thinking that
 # it is _required_ for USB support. Otherwise they'll disable udev and
 # that's going to be worse.
-IUSE="airplay alsa bluetooth bluray caps cec +css dbus dvd gbm gles java lcms libressl libusb lirc mariadb mysql nfs +opengl pulseaudio samba systemd +system-ffmpeg test +udev udisks upnp upower vaapi vdpau wayland webserver +X +xslt zeroconf"
-
-RESTRICT="!test? ( test )"
-
+IUSE="airplay alsa bluetooth bluray caps cec +css dbus dvd gbm gles java lcms libressl libusb lirc mariadb mysql nfs +opengl pulseaudio raspberry-pi samba systemd +system-ffmpeg test +udev udisks upnp upower vaapi vdpau wayland webserver +X +xslt zeroconf"
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	|| ( gles opengl )
-	^^ ( gbm wayland X )
+	^^ ( gbm raspberry-pi wayland X )
 	?? ( mariadb mysql )
 	udev? ( !libusb )
 	udisks? ( dbus )
 	upower? ( dbus )
 "
+RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	airplay? (
@@ -71,7 +79,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dev-libs/expat
 	dev-libs/flatbuffers
 	>=dev-libs/fribidi-0.19.7
-	cec? ( >=dev-libs/libcec-4.0 )
+	cec? ( >=dev-libs/libcec-4.0[raspberry-pi?] )
 	dev-libs/libpcre[cxx]
 	>=dev-libs/libinput-1.10.5
 	>=dev-libs/libxml2-2.9.4
@@ -83,7 +91,9 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=dev-libs/libfmt-3.0.1
 	dev-libs/libfstrcmp
 	gbm? (	media-libs/mesa[gbm] )
-	gles? ( media-libs/mesa[gles2] )
+	gles? (
+		!raspberry-pi? ( media-libs/mesa[gles2] )
+	)
 	lcms? ( media-libs/lcms:2 )
 	libusb? ( virtual/libusb:1 )
 	virtual/ttf-fonts
@@ -91,7 +101,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=media-libs/fontconfig-2.12.4
 	>=media-libs/freetype-2.8
 	>=media-libs/libass-0.13.4
-	media-libs/mesa[egl]
+	!raspberry-pi? ( media-libs/mesa[egl,X(+)] )
 	>=media-libs/taglib-1.11.1
 	system-ffmpeg? (
 		>=media-video/ffmpeg-${FFMPEG_VERSION}:=[encode,postproc]
@@ -105,6 +115,9 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	opengl? ( media-libs/glu )
 	!libressl? ( >=dev-libs/openssl-1.0.2l:0= )
 	libressl? ( dev-libs/libressl:0= )
+	raspberry-pi? (
+		|| ( media-libs/raspberrypi-userland media-libs/raspberrypi-userland-bin media-libs/mesa[egl,gles2,vc4] )
+	)
 	pulseaudio? ( media-sound/pulseaudio )
 	samba? ( >=net-fs/samba-3.4.6[smbclient(+)] )
 	>=sys-libs/zlib-1.2.11
@@ -126,9 +139,8 @@ COMMON_DEPEND="${PYTHON_DEPS}
 		>=dev-cpp/waylandpp-0.2.3:=
 		media-libs/mesa[wayland]
 		>=dev-libs/wayland-protocols-1.7
-		>=x11-libs/libxkbcommon-0.4.1
 	)
-	webserver? ( >=net-libs/libmicrohttpd-0.9.55[messages] )
+	webserver? ( >=net-libs/libmicrohttpd-0.9.55[messages(+)] )
 	X? (
 		x11-libs/libX11
 		x11-libs/libXrandr
@@ -136,11 +148,13 @@ COMMON_DEPEND="${PYTHON_DEPS}
 		system-ffmpeg? ( media-video/ffmpeg[X] )
 	)
 	x11-libs/libdrm
+	>=x11-libs/libxkbcommon-0.4.1
 	xslt? ( dev-libs/libxslt )
 	zeroconf? ( net-dns/avahi[dbus] )
 "
 RDEPEND="${COMMON_DEPEND}
 	lirc? ( app-misc/lirc )
+	!media-tv/xbmc
 	udisks? ( sys-fs/udisks:2 )
 	upower? ( sys-power/upower )
 "
@@ -192,6 +206,7 @@ src_prepare() {
 	if in_iuse java && use !java; then
 		eapply "${DISTDIR}"/${PN}-18.2-no-java-required.patch
 	fi
+
 	cmake-utils_src_prepare
 
 	# avoid long delays when powerkit isn't running #348580
@@ -242,7 +257,6 @@ src_configure() {
 		-DENABLE_LCMS2=$(usex lcms)
 		-DENABLE_LIRCCLIENT=$(usex lirc)
 		-DENABLE_MARIADBCLIENT=$(usex mariadb)
-		-DENABLE_MYSQLCLIENT=$(usex mysql)
 		-DENABLE_MICROHTTPD=$(usex webserver)
 		-DENABLE_MYSQLCLIENT=$(usex mysql)
 		-DENABLE_NFS=$(usex nfs)
@@ -284,6 +298,10 @@ src_configure() {
 		)
 	fi
 
+	if use raspberry-pi; then
+		mycmakeargs+=( -DCORE_PLATFORM_NAME="rbpi" )
+	fi
+
 	if use X; then
 		mycmakeargs+=( -DCORE_PLATFORM_NAME="x11" )
 	fi
@@ -293,34 +311,23 @@ src_configure() {
 
 src_compile() {
 	cmake-utils_src_compile all
-	use test && emake -C "${BUILD_DIR}" kodi-test
 }
 
 src_test() {
-	emake -C "${BUILD_DIR}" test
+	cmake-utils_src_make check
 }
 
 src_install() {
 	cmake-utils_src_install
 
-	pax-mark Em "${ED%/}"/usr/$(get_libdir)/${PN}/${PN}.bin
+	pax-mark Em "${ED}"/usr/$(get_libdir)/${PN}/${PN}.bin
 
 	newicon media/icon48x48.png kodi.png
 
-	rm "${ED%/}"/usr/share/kodi/addons/skin.estuary/fonts/Roboto-Thin.ttf || die
+	rm "${ED}"/usr/share/kodi/addons/skin.estuary/fonts/Roboto-Thin.ttf || die
 	dosym ../../../../fonts/roboto/Roboto-Thin.ttf \
 		usr/share/kodi/addons/skin.estuary/fonts/Roboto-Thin.ttf
 
 	python_domodule tools/EventClients/lib/python/xbmcclient.py
 	python_newscript "tools/EventClients/Clients/KodiSend/kodi-send.py" kodi-send
-}
-
-pkg_postinst() {
-	xdg_desktop_database_update
-	xdg_icon_cache_update
-}
-
-pkg_postrm() {
-	xdg_desktop_database_update
-	xdg_icon_cache_update
 }
