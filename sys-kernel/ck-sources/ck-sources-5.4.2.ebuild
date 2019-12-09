@@ -1,5 +1,6 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 2019 RarogCmex and others
 # Distributed under the terms of the GNU General Public License v2
+# Public Domain
 
 EAPI="6"
 ETYPE="sources"
@@ -26,19 +27,12 @@ K_BRANCH_ID="${KV_MAJOR}.${KV_MINOR}"
 
 DESCRIPTION="Gentoo's genpatches for Linux ${K_BRANCH_ID}, with Con Kolivas' MuQSS process scheduler."
 
-MUQSS_VERSION="196"
-MUQSS_FILE="0001-MultiQueue-Skiplist-Scheduler-v0.${MUQSS_VERSION}.patch"
-MUQSS_BASE_URL="http://ck.kolivas.org/patches/muqss/5.0"
-
-# clearly identify package name in distdir
-MUQSS_DISTNAME="${PN}-${K_BRANCH_ID}-muqss.patch"
-
-CK_LVER_URL="${MUQSS_BASE_URL}/${K_BRANCH_ID}"
-CK_URI="${CK_LVER_URL}/${MUQSS_FILE} -> ${MUQSS_DISTNAME}"
+CK_EXTRAVERSION="ck1" 
+CK_URI="http://ck.kolivas.org/patches/5.0/${K_BRANCH_ID}/${K_BRANCH_ID}-${CK_SV}/patch-${K_BRANCH_ID}-${CK_EXTRAVERSION}.xz"
 
 SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI} ${CK_URI}"
 
-UNIPATCH_LIST="${DISTDIR}/${MUQSS_DISTNAME}"
+UNIPATCH_LIST="${DISTDIR}/patch-${K_BRANCH_ID}-${CK_SV}.xz"
 UNIPATCH_STRICTORDER="yes"
 
 pkg_setup() {
