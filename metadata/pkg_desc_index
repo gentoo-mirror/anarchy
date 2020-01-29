@@ -5,3 +5,4 @@ dev-libs/skalibs 2.8.0.0: skarnet.org general-purpose libraries
 dev-qt/qtnetwork 5.13.2 5.14.1: Network abstraction library for the Qt5 framework
 media-tv/kodi 18.5-r1: A free and open source media-player and entertainment hub
 net-libs/nodejs 13.7.0-r1: A JavaScript runtime built on Chrome's V8 JavaScript engine
+sys-kernel/zen-sources 5.4.15: The Zen Kernel Live Sources
