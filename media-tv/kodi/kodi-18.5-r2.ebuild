@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -15,7 +15,6 @@ SRC_URI="https://github.com/xbmc/libdvdcss/archive/${LIBDVDCSS_VERSION}.tar.gz -
 	https://github.com/xbmc/libdvdnav/archive/${LIBDVDNAV_VERSION}.tar.gz -> libdvdnav-${LIBDVDNAV_VERSION}.tar.gz
 	!java? ( https://dev.gentoo.org/~anarchy/patches/${PN}-18.2-no-java-required.patch )
 	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz )"
-
 PATCHES=(
 	"${FILESDIR}/${P}-cassert.patch"
 	"${FILESDIR}/musl/0001-add-missing-stdint.h.patch"
@@ -28,7 +27,7 @@ PATCHES=(
 )
 
 if [[ ${PV} == *9999 ]] ; then
-	PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
+	PYTHON_COMPAT=( python2_7 python3_{6,7} )
 	EGIT_REPO_URI="https://github.com/xbmc/xbmc.git"
 	inherit git-r3
 else
@@ -43,7 +42,7 @@ else
 	S=${WORKDIR}/xbmc-${MY_PV}-${CODENAME}
 fi
 
-inherit autotools cmake-utils desktop linux-info pax-utils python-single-r1 xdg
+inherit autotools cmake desktop linux-info pax-utils python-single-r1 xdg
 
 DESCRIPTION="A free and open source media-player and entertainment hub"
 HOMEPAGE="https://kodi.tv/ https://kodi.wiki/"
@@ -85,8 +84,8 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=dev-libs/libxml2-2.9.4
 	>=dev-libs/lzo-2.04
 	dev-libs/tinyxml[stl]
-	dev-python/pillow[${PYTHON_USEDEP}]
-	$(python_gen_cond_dep 'dev-python/pycryptodome[${PYTHON_USEDEP}]' 'python3*')
+	$(python_gen_cond_dep 'dev-python/pillow[${PYTHON_MULTI_USEDEP}]')
+	$(python_gen_cond_dep 'dev-python/pycryptodome[${PYTHON_MULTI_USEDEP}]' 'python3*')
 	>=dev-libs/libcdio-0.94
 	>=dev-libs/libfmt-3.0.1
 	dev-libs/libfstrcmp
@@ -207,7 +206,7 @@ src_prepare() {
 		eapply "${DISTDIR}"/${PN}-18.2-no-java-required.patch
 	fi
 
-	cmake-utils_src_prepare
+	cmake_src_prepare
 
 	# avoid long delays when powerkit isn't running #348580
 	sed -i \
@@ -306,19 +305,19 @@ src_configure() {
 		mycmakeargs+=( -DCORE_PLATFORM_NAME="x11" )
 	fi
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 src_compile() {
-	cmake-utils_src_compile all
+	cmake_src_compile all
 }
 
 src_test() {
-	cmake-utils_src_make check
+	cmake_build check
 }
 
 src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 
 	pax-mark Em "${ED}"/usr/$(get_libdir)/${PN}/${PN}.bin
 
