@@ -5,4 +5,4 @@ dev-libs/skalibs 2.8.0.0: skarnet.org general-purpose libraries
 dev-qt/qtnetwork 5.13.2 5.14.1: Network abstraction library for the Qt5 framework
 mail-client/thunderbird 68.6.0: Thunderbird Mail Client
 media-tv/kodi 18.6: A free and open source media-player and entertainment hub
-www-client/firefox 75.0_beta10: Firefox Web Browser
+www-client/firefox 75.0_beta11: Firefox Web Browser
