@@ -1,8 +1,11 @@
 acct-group/gpio 0: Group for users with access to SPI
 acct-group/i2c 0: Group for users with access to I2C
 acct-group/spi 0: Group for users with access to SPI
-dev-libs/skalibs 2.8.0.0: skarnet.org general-purpose libraries
-dev-qt/qtnetwork 5.13.2 5.14.1: Network abstraction library for the Qt5 framework
-mail-client/thunderbird 68.6.0: Thunderbird Mail Client
+dev-libs/jemalloc 5.2.0: Jemalloc is a general-purpose scalable concurrent allocator
+dev-libs/nspr 4.25: Netscape Portable Runtime
+dev-libs/nss 3.51.1: Mozilla's Network Security Services library that implements PKI support
+dev-libs/nss-pem 1.0.5: PEM file reader for Network Security Services (NSS)
+dev-qt/qtnetwork 5.14.1 5.14.2: Network abstraction library for the Qt5 framework
+mail-client/thunderbird 68.7.0: Thunderbird Mail Client
 media-tv/kodi 18.6: A free and open source media-player and entertainment hub
 www-client/firefox 76.0_beta4: Firefox Web Browser
