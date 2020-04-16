@@ -318,6 +318,13 @@ src_prepare() {
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
 
+	# prebuilt glibc binary files cause python2.7 segfault on musl
+	if use elibc_musl; then
+		rm "${S}"/third_party/python/psutil/psutil/*.so
+		rm "${S}"/third_party/python/psutil/build/lib.linux-x86_64-2.7/psutil/*.so
+		rm "${S}"/third_party/python/psutil/build/temp.linux-x86_64-2.7/psutil/*.o
+	fi
+
 	# Enable gnomebreakpad
 	if use debug ; then
 		sed -i -e "s:GNOME_DISABLE_CRASH_DIALOG=1:GNOME_DISABLE_CRASH_DIALOG=0:g" \
