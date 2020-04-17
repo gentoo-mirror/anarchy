@@ -42,7 +42,7 @@ LLVM_MAX_SLOT=10
 
 inherit check-reqs eapi7-ver flag-o-matic toolchain-funcs eutils \
 		gnome2-utils llvm mozcoreconf-v6 pax-utils xdg-utils \
-		autotools mozlinguas-v2 virtualx eapi7-ver
+		autotools mozlinguas-v2 multiprocessing virtualx eapi7-ver
 
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE="https://www.mozilla.com/firefox"
@@ -317,6 +317,12 @@ src_prepare() {
 
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
+
+       # Make LTO respect MAKEOPTS
+       sed -i \
+               -e "s/multiprocessing.cpu_count()/$(makeopts_jobs)/" \
+               "${S}"/build/moz.configure/toolchain.configure \
+               || die "sed failed to set num_cores"
 
 	# prebuilt glibc binary files cause python2.7 segfault on musl
 	if use elibc_musl; then
