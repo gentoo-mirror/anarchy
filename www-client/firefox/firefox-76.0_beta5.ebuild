@@ -318,10 +318,10 @@ src_prepare() {
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
 
-       # Make LTO respect MAKEOPTS
-       sed -i \
-               -e "s/multiprocessing.cpu_count()/$(makeopts_jobs)/" \
-               "${S}"/build/moz.configure/toolchain.configure \
+	# Make LTO respect MAKEOPTS
+	sed -i \
+		 -e "s/multiprocessing.cpu_count()/$(makeopts_jobs)/" \
+		"${S}"/build/moz.configure/toolchain.configure \
                || die "sed failed to set num_cores"
 
 	# remove prebuilt files, fixes sandbox violations for musl pgo builds.
