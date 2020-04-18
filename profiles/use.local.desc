@@ -43,10 +43,6 @@ media-tv/kodi:system-ffmpeg - Use system ffmpeg instead of the bundled one
 media-tv/kodi:udev - Use sys-fs/udev rules to handle devices' permissions and hotplug support. Unless you know what you're doing do not disable this flag on Linux kernels. This is provided as an option for completeness.
 media-tv/kodi:webserver - Enable internal webserver
 media-tv/kodi:xslt - Enable XSLT support using dev-libs/libxslt
-sys-devel/binutils:default-gold - Set ld to point to ld.gold instead of ld.bfd
-sys-devel/binutils:gold - Build ld.gold linker
-sys-devel/binutils:multitarget - Adds support to binutils for cross compiling (does not work with gas)
-sys-devel/binutils:plugins - Enable plugin support in tools
 www-client/firefox:bindist - Disable official Firefox branding (icons, name) which are not binary-redistributable according to upstream.
 www-client/firefox:clang - Use Clang compiler instead of GCC
 www-client/firefox:custom-optimization - Build with user-specified compiler optimizations (-Os, -O0, -O1, -O2, -O3) from CFLAGS (unsupported)
