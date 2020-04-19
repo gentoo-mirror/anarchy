@@ -324,10 +324,8 @@ src_prepare() {
 		"${S}"/build/moz.configure/toolchain.configure \
                || die "sed failed to set num_cores"
 
-	# remove prebuilt files, fixes sandbox violations for musl pgo builds.
-	rm "${S}"/third_party/python/psutil/psutil/*.so
-	rm "${S}"/third_party/python/psutil/build/lib.linux-x86_64-2.7/psutil/*.so
-	rm "${S}"/third_party/python/psutil/build/temp.linux-x86_64-2.7/psutil/*.o
+	einfo "Removing pre-built binaries ..."
+	find "${S}"/third_party -type f \( -name '*.so' -o -name '*.o' \) -print -delete || die
 
 	# Enable gnomebreakpad
 	if use debug ; then
