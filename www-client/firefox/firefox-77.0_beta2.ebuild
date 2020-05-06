@@ -27,7 +27,7 @@ if [[ ${MOZ_ESR} == 1 ]] ; then
 fi
 
 # Patch version
-PATCH="${PN}-76.0-patches-02"
+PATCH="${PN}-77.0-patches-02"
 
 MOZ_HTTP_URI="https://archive.mozilla.org/pub/${PN}/releases"
 MOZ_SRC_URI="${MOZ_HTTP_URI}/${MOZ_PV}/source/firefox-${MOZ_PV}.source.tar.xz"
@@ -159,15 +159,6 @@ DEPEND="${CDEPEND}
 				=sys-devel/lld-8*
 				sys-devel/llvm:8[gold]
 				pgo? ( =sys-libs/compiler-rt-sanitizers-8*[profile] )
-			)
-		)
-		(
-			sys-devel/clang:7
-			!clang? ( sys-devel/llvm:7 )
-			clang? (
-				=sys-devel/lld-7*
-				sys-devel/llvm:7[gold]
-				pgo? ( =sys-libs/compiler-rt-sanitizers-7*[profile] )
 			)
 		)
 	)
@@ -651,7 +642,7 @@ src_compile() {
 		SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 		MOZ_NOSPAM=1 \
 		${_virtx} \
-		./mach build --verbose \
+		./mach build --verbose > /dev/null \
 		|| die
 }
 
