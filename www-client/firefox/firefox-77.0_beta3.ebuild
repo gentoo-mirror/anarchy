@@ -642,7 +642,7 @@ src_compile() {
 		SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 		MOZ_NOSPAM=1 \
 		${_virtx} \
-		./mach build --verbose > /dev/null \
+		./mach build --verbose >> ${PORTAGE_BUILDDIR}/temp/build.log \
 		|| die
 }
 
