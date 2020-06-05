@@ -27,7 +27,7 @@ if [[ ${MOZ_ESR} == 1 ]] ; then
 fi
 
 # Patch version
-PATCH="${PN}-77.0-patches-02"
+PATCH="${PN}-77.0-patches-03"
 
 MOZ_HTTP_URI="https://archive.mozilla.org/pub/${PN}/releases"
 MOZ_SRC_URI="${MOZ_HTTP_URI}/${MOZ_PV}/source/firefox-${MOZ_PV}.source.tar.xz"
@@ -41,8 +41,9 @@ fi
 LLVM_MAX_SLOT=10
 
 inherit check-reqs eapi7-ver flag-o-matic toolchain-funcs eutils \
-		gnome2-utils llvm mozcoreconf-v6 pax-utils xdg-utils \
-		autotools mozlinguas-v2 multiprocessing virtualx eapi7-ver
+		gnome2-utils llvm mozcoreconf-v6 multiprocessing \
+		pax-utils xdg-utils autotools mozlinguas-v2 virtualx \
+		eapi7-ver
 
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE="https://www.mozilla.com/firefox"
@@ -62,13 +63,13 @@ REQUIRED_USE="pgo? ( lto )"
 RESTRICT="!bindist? ( bindist )
 	!test? ( test )"
 
-PATCH_URIS=( https://dev.gentoo.org/~{whissi,anarchy,polynomial-c,axs}/mozilla/patchsets/${PATCH}.tar.xz )
+PATCH_URIS=( https://dev.gentoo.org/~anarchy/mozilla/patchsets/${PATCH}.tar.xz )
 SRC_URI="${SRC_URI}
 	${MOZ_SRC_URI}
 	${PATCH_URIS[@]}"
 
 CDEPEND="
-	>=dev-libs/nss-3.51.1
+	>=dev-libs/nss-3.52.1
 	>=dev-libs/nspr-4.25
 	dev-libs/atk
 	dev-libs/expat
@@ -129,7 +130,7 @@ RDEPEND="${CDEPEND}
 DEPEND="${CDEPEND}
 	app-arch/zip
 	app-arch/unzip
-	>=dev-util/cbindgen-0.13.0
+	>=dev-util/cbindgen-0.14.1
 	>=net-libs/nodejs-10.19.0
 	>=sys-devel/binutils-2.30
 	sys-apps/findutils
@@ -161,6 +162,15 @@ DEPEND="${CDEPEND}
 				pgo? ( =sys-libs/compiler-rt-sanitizers-8*[profile] )
 			)
 		)
+		(
+			sys-devel/clang:7
+			!clang? ( sys-devel/llvm:7 )
+			clang? (
+				=sys-devel/lld-7*
+				sys-devel/llvm:7[gold]
+				pgo? ( =sys-libs/compiler-rt-sanitizers-7*[profile] )
+			)
+		)
 	)
 	pulseaudio? (
 		|| (
@@ -188,21 +198,6 @@ BUILD_OBJ_DIR="${S}/ff"
 if [[ -z $GMP_PLUGIN_LIST ]] ; then
 	GMP_PLUGIN_LIST=( gmp-gmpopenh264 gmp-widevinecdm )
 fi
-
-fix_path() {
-	local value_to_move=${1}
-	local new_path path_value
-	IFS=:; local -a path_values=( ${PATH} )
-	for path_value in "${path_values[@]}" ; do
-		if [[ ${path_value} == *"${value_to_move}"* ]] ; then
-			new_path="${path_value}${new_path:+:}${new_path}"
-		else
-			new_path+="${new_path:+:}${path_value}"
-		fi
-	done
-
-	echo "${new_path}"
-}
 
 llvm_check_deps() {
 	if ! has_version --host-root "sys-devel/clang:${LLVM_SLOT}" ; then
@@ -286,13 +281,10 @@ pkg_setup() {
 
 	llvm_pkg_setup
 
-	# Workaround for #627726
 	if has ccache ${FEATURES} ; then
-		einfo "Fixing PATH for FEATURES=ccache ..."
-		PATH=$(fix_path 'ccache/bin')
-	elif has distcc ${FEATURES} ; then
-		einfo "Fixing PATH for FEATURES=distcc ..."
-		PATH=$(fix_path 'distcc/bin')
+		if use clang && use pgo ; then
+			die "Using FEATURES=ccache with USE=clang and USE=pgo is currently known to be broken (bug #718632)."
+		fi
 	fi
 }
 
@@ -306,14 +298,14 @@ src_unpack() {
 src_prepare() {
 	eapply "${WORKDIR}/firefox"
 
-	# Allow user to apply any additional patches without modifing ebuild
-	eapply_user
-
 	# Make LTO respect MAKEOPTS
 	sed -i \
-		 -e "s/multiprocessing.cpu_count()/$(makeopts_jobs)/" \
-		"${S}"/build/moz.configure/toolchain.configure \
-               || die "sed failed to set num_cores"
+		-e "s/multiprocessing.cpu_count()/$(makeopts_jobs)/" \
+		"${S}"/build/moz.configure/lto-pgo.configure \
+		|| die "sed failed to set num_cores"
+
+	# Allow user to apply any additional patches without modifing ebuild
+	eapply_user
 
 	einfo "Removing pre-built binaries ..."
 	find "${S}"/third_party -type f \( -name '*.so' -o -name '*.o' \) -print -delete || die
@@ -642,7 +634,7 @@ src_compile() {
 		SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 		MOZ_NOSPAM=1 \
 		${_virtx} \
-		./mach build --verbose >> ${PORTAGE_BUILDDIR}/temp/build.log \
+		./mach build --verbose \
 		|| die
 }
 
