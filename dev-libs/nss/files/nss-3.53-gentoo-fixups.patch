@@ -1,27 +1,76 @@
-Submitted By:            Xi Ruoyao <xry111_AT_mengyan1223_DOT_wang>
-Date:                    2020-05-31
-Initial Package Version: 3.12.4
-Upstream Status:         Not applicable
-Origin:                  Self, rediffed for nss-3.53.
-Description:             Adds auto-generated nss.pc and nss-config script, and
-                         allows building without nspr in the source tree.
-                         For 3.40.1, Requires: updated to nspr >= 4.20.
-                         For 3.46.1, Requires: updated to nspr >= 4.21.
-                         For 3.48, Requires: updated to nspr >= 4.24.
-                         For 3.51.1, Requires: updated to nspr >= 4.25.
+From 1b3c48499abb000d708abe5f05413c1f4155e086 Mon Sep 17 00:00:00 2001
+From: Jory Pratt <anarchy@gentoo.org>
+Date: Mon, 8 Jun 2020 12:22:29 -0500
+Subject: [PATCH] Add pkg-config and nss-config for Gentoo
 
-diff -Nuar a/config/Makefile b/config/Makefile
---- a/config/Makefile	1970-01-01 08:00:00.000000000 +0800
-+++ b/config/Makefile	2020-05-31 13:48:14.423566855 +0800
+---
+ Makefile             |  15 +----
+ config/Makefile      |  40 ++++++++++++
+ config/nss-config.in | 145 +++++++++++++++++++++++++++++++++++++++++++
+ config/nss.pc.in     |  12 ++++
+ manifest.mn          |   2 +-
+ 5 files changed, 200 insertions(+), 14 deletions(-)
+ create mode 100644 config/Makefile
+ create mode 100644 config/nss-config.in
+ create mode 100644 config/nss.pc.in
+
+diff --git a/Makefile b/Makefile
+index eb4ed1a..f979d90 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,6 +4,8 @@
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+ # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ 
++default: nss_build_all
++
+ #######################################################################
+ # (1) Include initial platform-independent assignments (MANDATORY).   #
+ #######################################################################
+@@ -48,12 +50,9 @@ include $(CORE_DEPTH)/coreconf/rules.mk
+ #######################################################################
+ 
+ nss_build_all:
+-	$(MAKE) build_nspr
+ 	$(MAKE) all
+-	$(MAKE) latest
+ 
+ nss_clean_all:
+-	$(MAKE) clobber_nspr
+ 	$(MAKE) clobber
+ 
+ NSPR_CONFIG_STATUS = $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)/config.status
+@@ -138,16 +137,6 @@ $(NSPR_CONFIG_STATUS): $(NSPR_CONFIGURE)
+ 	--prefix='$(NSS_GYP_PREFIX)'
+ endif
+ 
+-build_nspr: $(NSPR_CONFIG_STATUS)
+-	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)
+-	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)/pr/tests
+-
+-install_nspr: build_nspr
+-	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME) install
+-
+-clobber_nspr: $(NSPR_CONFIG_STATUS)
+-	$(MAKE) -C $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME) clobber
+-
+ build_docs:
+ 	$(MAKE) -C $(CORE_DEPTH)/doc
+ 
+diff --git a/config/Makefile b/config/Makefile
+new file mode 100644
+index 0000000..aaf1991
+--- /dev/null
++++ b/config/Makefile
 @@ -0,0 +1,40 @@
 +CORE_DEPTH = ..
 +DEPTH      = ..
 +
 +include $(CORE_DEPTH)/coreconf/config.mk
 +
-+NSS_MAJOR_VERSION = `grep "NSS_VMAJOR" ../lib/nss/nss.h | awk '{print $$3}'`
-+NSS_MINOR_VERSION = `grep "NSS_VMINOR" ../lib/nss/nss.h | awk '{print $$3}'`
-+NSS_PATCH_VERSION = `grep "NSS_VPATCH" ../lib/nss/nss.h | awk '{print $$3}'`
++NSS_MAJOR_VERSION = $(shell grep -F "NSS_VMAJOR" ../lib/nss/nss.h | awk '{print $$3}')
++NSS_MINOR_VERSION = $(shell grep -F "NSS_VMINOR" ../lib/nss/nss.h | awk '{print $$3}')
++NSS_PATCH_VERSION = $(shell grep -F "NSS_VPATCH" ../lib/nss/nss.h | awk '{print $$3}')
 +PREFIX = /usr
 +
 +all: export libs
@@ -31,14 +80,14 @@ diff -Nuar a/config/Makefile b/config/Makefile
 +	mkdir -p $(DIST)/lib/pkgconfig
 +	sed -e "s,@prefix@,$(PREFIX)," \
 +	    -e "s,@exec_prefix@,\$${prefix}," \
-+	    -e "s,@libdir@,\$${prefix}/lib," \
++	    -e "s,@libdir@,\$${prefix}/lib64," \
 +	    -e "s,@includedir@,\$${prefix}/include/nss," \
 +	    -e "s,@NSS_MAJOR_VERSION@,$(NSS_MAJOR_VERSION),g" \
 +	    -e "s,@NSS_MINOR_VERSION@,$(NSS_MINOR_VERSION)," \
 +	    -e "s,@NSS_PATCH_VERSION@,$(NSS_PATCH_VERSION)," \
 +	    nss.pc.in > nss.pc
 +	chmod 0644 nss.pc
-+	ln -sf ../../../../nss/config/nss.pc $(DIST)/lib/pkgconfig
++	ln -sf ../../../../config/nss.pc $(DIST)/lib/pkgconfig
 +
 +	# Create the nss-config script
 +	mkdir -p $(DIST)/bin
@@ -48,16 +97,18 @@ diff -Nuar a/config/Makefile b/config/Makefile
 +	    -e "s,@NSS_PATCH_VERSION@,$(NSS_PATCH_VERSION)," \
 +	    nss-config.in > nss-config
 +	chmod 0755 nss-config
-+	ln -sf ../../../nss/config/nss-config $(DIST)/bin
++	ln -sf ../../../config/nss-config $(DIST)/bin
 +
 +libs:
 +
 +dummy: all export libs
 +
-diff -Nuar a/config/nss-config.in b/config/nss-config.in
---- a/config/nss-config.in	1970-01-01 08:00:00.000000000 +0800
-+++ b/config/nss-config.in	2020-05-31 13:48:14.424566860 +0800
-@@ -0,0 +1,153 @@
+diff --git a/config/nss-config.in b/config/nss-config.in
+new file mode 100644
+index 0000000..3a957b8
+--- /dev/null
++++ b/config/nss-config.in
+@@ -0,0 +1,145 @@
 +#!/bin/sh
 +
 +prefix=@prefix@
@@ -80,10 +131,9 @@ diff -Nuar a/config/nss-config.in b/config/nss-config.in
 +	[--cflags]
 +Dynamic Libraries:
 +	nss
-+	nssutil
-+	smime
 +	ssl
-+	softokn
++	smime
++	nssutil
 +EOF
 +	exit $1
 +}
@@ -92,39 +142,38 @@ diff -Nuar a/config/nss-config.in b/config/nss-config.in
 +	usage 1 1>&2
 +fi
 +
++lib_ssl=yes
++lib_smime=yes
 +lib_nss=yes
 +lib_nssutil=yes
-+lib_smime=yes
-+lib_ssl=yes
-+lib_softokn=yes
 +
 +while test $# -gt 0; do
 +  case "$1" in
-+  -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
++  -*=*) optarg=$(echo "$1" | sed 's/[-_a-zA-Z0-9]*=//') ;;
 +  *) optarg= ;;
 +  esac
 +
 +  case $1 in
 +    --prefix=*)
-+      prefix=$optarg
++      prefix=${optarg}
 +      ;;
 +    --prefix)
 +      echo_prefix=yes
 +      ;;
 +    --exec-prefix=*)
-+      exec_prefix=$optarg
++      exec_prefix=${optarg}
 +      ;;
 +    --exec-prefix)
 +      echo_exec_prefix=yes
 +      ;;
 +    --includedir=*)
-+      includedir=$optarg
++      includedir=${optarg}
 +      ;;
 +    --includedir)
 +      echo_includedir=yes
 +      ;;
 +    --libdir=*)
-+      libdir=$optarg
++      libdir=${optarg}
 +      ;;
 +    --libdir)
 +      echo_libdir=yes
@@ -138,20 +187,17 @@ diff -Nuar a/config/nss-config.in b/config/nss-config.in
 +    --libs)
 +      echo_libs=yes
 +      ;;
++    ssl)
++      lib_ssl=yes
++      ;;
++    smime)
++      lib_smime=yes
++      ;;
 +    nss)
 +      lib_nss=yes
 +      ;;
 +    nssutil)
 +      lib_nssutil=yes
-+      ;;
-+    smime)
-+      lib_smime=yes
-+      ;;
-+    ssl)
-+      lib_ssl=yes
-+      ;;
-+    softokn)
-+      lib_softokn=yes
 +      ;;
 +    *)
 +      usage 1 1>&2
@@ -161,59 +207,58 @@ diff -Nuar a/config/nss-config.in b/config/nss-config.in
 +done
 +
 +# Set variables that may be dependent upon other variables
-+if test -z "$exec_prefix"; then
-+    exec_prefix=`pkg-config --variable=exec_prefix nss`
++if test -z "${exec_prefix}"; then
++    exec_prefix=$(pkg-config --variable=exec_prefix nss)
 +fi
-+if test -z "$includedir"; then
-+    includedir=`pkg-config --variable=includedir nss`
++if test -z "${includedir}"; then
++    includedir=$(pkg-config --variable=includedir nss)
 +fi
-+if test -z "$libdir"; then
-+    libdir=`pkg-config --variable=libdir nss`
-+fi
-+
-+if test "$echo_prefix" = "yes"; then
-+    echo $prefix
++if test -z "${libdir}"; then
++    libdir=$(pkg-config --variable=libdir nss)
 +fi
 +
-+if test "$echo_exec_prefix" = "yes"; then
-+    echo $exec_prefix
++if test "${echo_prefix}" = "yes"; then
++    echo ${prefix}
 +fi
 +
-+if test "$echo_includedir" = "yes"; then
-+    echo $includedir
++if test "${echo_exec_prefix}" = "yes"; then
++    echo ${exec_prefix}
 +fi
 +
-+if test "$echo_libdir" = "yes"; then
-+    echo $libdir
++if test "${echo_includedir}" = "yes"; then
++    echo ${includedir}
 +fi
 +
-+if test "$echo_cflags" = "yes"; then
-+    echo -I$includedir
++if test "${echo_libdir}" = "yes"; then
++    echo ${libdir}
 +fi
 +
-+if test "$echo_libs" = "yes"; then
-+      libdirs="-L$libdir"
-+      if test -n "$lib_nss"; then
-+	libdirs="$libdirs -lnss${major_version}"
++if test "${echo_cflags}" = "yes"; then
++    echo -I${includedir}
++fi
++
++if test "${echo_libs}" = "yes"; then
++      libdirs=""
++      if test -n "${lib_ssl}"; then
++	libdirs="${libdirs} -lssl${major_version}"
 +      fi
-+      if test -n "$lib_nssutil"; then
-+        libdirs="$libdirs -lnssutil${major_version}"
++      if test -n "${lib_smime}"; then
++	libdirs="${libdirs} -lsmime${major_version}"
 +      fi
-+      if test -n "$lib_smime"; then
-+	libdirs="$libdirs -lsmime${major_version}"
++      if test -n "${lib_nss}"; then
++	libdirs="${libdirs} -lnss${major_version}"
 +      fi
-+      if test -n "$lib_ssl"; then
-+	libdirs="$libdirs -lssl${major_version}"
++      if test -n "${lib_nssutil}"; then
++       libdirs="${libdirs} -lnssutil${major_version}"
 +      fi
-+      if test -n "$lib_softokn"; then
-+        libdirs="$libdirs -lsoftokn${major_version}"
-+      fi
-+      echo $libdirs
-+fi      
++      echo ${libdirs}
++fi
 +
-diff -Nuar a/config/nss.pc.in b/config/nss.pc.in
---- a/config/nss.pc.in	1970-01-01 08:00:00.000000000 +0800
-+++ b/config/nss.pc.in	2020-05-31 13:48:14.424566860 +0800
+diff --git a/config/nss.pc.in b/config/nss.pc.in
+new file mode 100644
+index 0000000..03f1e39
+--- /dev/null
++++ b/config/nss.pc.in
 @@ -0,0 +1,12 @@
 +prefix=@prefix@
 +exec_prefix=@exec_prefix@
@@ -224,43 +269,22 @@ diff -Nuar a/config/nss.pc.in b/config/nss.pc.in
 +Description: Network Security Services
 +Version: @NSS_MAJOR_VERSION@.@NSS_MINOR_VERSION@.@NSS_PATCH_VERSION@
 +Requires: nspr >= 4.25
-+Libs: -L@libdir@ -lnss@NSS_MAJOR_VERSION@ -lnssutil@NSS_MAJOR_VERSION@ -lsmime@NSS_MAJOR_VERSION@ -lssl@NSS_MAJOR_VERSION@ -lsoftokn@NSS_MAJOR_VERSION@
++Libs: -lssl3 -lsmime3 -lnss3 -lnssutil3
 +Cflags: -I${includedir}
 +
-diff -Nuar a/Makefile b/Makefile
---- a/Makefile	2020-05-30 04:34:42.000000000 +0800
-+++ b/Makefile	2020-05-31 13:48:51.500733022 +0800
-@@ -4,6 +4,8 @@
- # License, v. 2.0. If a copy of the MPL was not distributed with this
- # file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
-+default: nss_build_all
-+
- #######################################################################
- # (1) Include initial platform-independent assignments (MANDATORY).   #
- #######################################################################
-@@ -48,12 +50,10 @@
- #######################################################################
- 
- nss_build_all:
--	$(MAKE) build_nspr
- 	$(MAKE) all
- 	$(MAKE) latest
- 
- nss_clean_all:
--	$(MAKE) clobber_nspr
- 	$(MAKE) clobber
- 
- NSPR_CONFIG_STATUS = $(CORE_DEPTH)/../nspr/$(OBJDIR_NAME)/config.status
-diff -Nuar a/manifest.mn b/manifest.mn
---- a/manifest.mn	2020-05-30 04:34:42.000000000 +0800
-+++ b/manifest.mn	2020-05-31 13:48:30.652640413 +0800
-@@ -10,7 +10,7 @@
+diff --git a/manifest.mn b/manifest.mn
+index dada8ab..72dc9b3 100644
+--- a/manifest.mn
++++ b/manifest.mn
+@@ -10,7 +10,7 @@ IMPORTS =	nspr20/v4.8 \
  
  RELEASE = nss
  
 -DIRS = coreconf lib cmd cpputil gtests
-+DIRS = coreconf lib cmd cpputil gtests config
++DIRS = coreconf lib cmd cpputil config
  
  lib: coreconf
  cmd: lib
+-- 
+2.26.2
+
