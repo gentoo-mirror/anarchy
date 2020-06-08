@@ -36,7 +36,7 @@ MULTILIB_CHOST_TOOLS=(
 
 PATCHES=(
 	# Custom changes for gentoo
-	"${FILESDIR}/${PN}-3.47-gentoo-fixups.patch"
+	"${FILESDIR}/${PN}-3.53-gentoo-fixups.patch"
 	"${FILESDIR}/${PN}-3.21-gentoo-fixup-warnings.patch"
 	"${FILESDIR}/${PN}-3.23-hppa-byte_order.patch"
 )
@@ -154,13 +154,12 @@ multilib_src_compile() {
 	export BUILD_OPT=1
 	export NSS_USE_SYSTEM_SQLITE=1
 	export NSDISTMODE=copy
-	export NSS_ENABLE_ECC=1
 	export FREEBL_NO_DEPEND=1
 	export FREEBL_LOWHASH=1
 	export NSS_SEED_ONLY_DEV_URANDOM=1
-	export ASFLAGS=""
-	export USE_SYSTEM_ZLIB=1 
+	export USE_SYSTEM_ZLIB=1
 	export ZLIB_LIBS=-lz
+	export ASFLAGS=""
 
 	local d
 
