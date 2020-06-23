@@ -22,7 +22,7 @@ RDEPEND="
 	>=dev-libs/nspr-${NSPR_VER}[${MULTILIB_USEDEP}]
 	>=dev-db/sqlite-3.8.2[${MULTILIB_USEDEP}]
 	>=sys-libs/zlib-1.2.8-r1[${MULTILIB_USEDEP}]
-	>=virtual/pkgconfig-0-r1[${MULTILIB_USEDEP}]
+	virtual/pkgconfig
 "
 DEPEND="${RDEPEND}"
 
@@ -169,7 +169,7 @@ multilib_src_compile() {
 	NSPR_LIB_DIR="${T}/fakedir" \
 	emake -j1 -C coreconf \
 		CC="$(tc-getBUILD_CC)" \
-		${buildbits:-${mybits}}
+		${buildbits-${mybits}}
 	makeargs+=( NSINSTALL="${PWD}/$(find -type f -name nsinstall)" )
 
 	# Then build the target tools.
