@@ -16,8 +16,8 @@ SRC_URI="https://github.com/xbmc/libdvdcss/archive/${LIBDVDCSS_VERSION}.tar.gz -
 	!java? ( https://dev.gentoo.org/~anarchy/patches/${PN}-18.2-no-java-required.patch )
 	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz )"
 
+
 PATCHES=(
-	"${FILESDIR}/${PN}-18.5-cassert.patch"
 	"${FILESDIR}/musl/0001-add-missing-stdint.h.patch"
 	"${FILESDIR}/musl/0002-fix-fileemu.patch"
 	"${FILESDIR}/musl/0003_use_stdint_for_musl.patch"
