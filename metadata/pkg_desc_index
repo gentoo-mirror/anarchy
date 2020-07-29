@@ -7,5 +7,5 @@ dev-libs/nss 3.53.1: Mozilla's Network Security Services library that implements
 dev-libs/nss-pem 1.0.5: PEM file reader for Network Security Services (NSS)
 dev-qt/qtnetwork 5.14.2-r1: Network abstraction library for the Qt5 framework
 mail-client/thunderbird 68.7.0-r1: Thunderbird Mail Client
-media-tv/kodi 18.7.1: A free and open source media-player and entertainment hub
+media-tv/kodi 18.8: A free and open source media-player and entertainment hub
 www-client/firefox 77.0.1: Firefox Web Browser
