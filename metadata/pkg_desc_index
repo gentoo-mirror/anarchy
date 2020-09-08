@@ -9,4 +9,4 @@ dev-qt/qtnetwork 5.14.2-r1: Network abstraction library for the Qt5 framework
 mail-client/thunderbird 68.7.0-r1: Thunderbird Mail Client
 media-tv/kodi 18.8: A free and open source media-player and entertainment hub
 virtual/rust 1.42.0: Virtual for Rust language compiler
-www-client/firefox 77.0.1: Firefox Web Browser
+www-client/firefox 81.0_beta7: Firefox Web Browser
