@@ -5,7 +5,7 @@ EAPI=7
 
 inherit eutils flag-o-matic multilib toolchain-funcs multilib-minimal
 
-NSPR_VER="4.25"
+NSPR_VER="4.28"
 RTM_NAME="NSS_${PV//./_}_RTM"
 
 DESCRIPTION="Mozilla's Network Security Services library that implements PKI support"
@@ -39,6 +39,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-3.53-gentoo-fixups.patch"
 	"${FILESDIR}/${PN}-3.21-gentoo-fixup-warnings.patch"
 	"${FILESDIR}/${PN}-3.23-hppa-byte_order.patch"
+	"${FILESDIR}/${PN}-3.53-fix-building-on-ppc.patch"
 )
 
 src_prepare() {
@@ -160,6 +161,14 @@ multilib_src_compile() {
 	export USE_SYSTEM_ZLIB=1
 	export ZLIB_LIBS=-lz
 	export ASFLAGS=""
+	# Fix build failure on arm64
+	export NS_USE_GCC=1
+	# Detect compiler type and set proper environment value
+	if tc-is-gcc; then
+		export CC_IS_GCC=1
+	elif tc-is-clang; then
+		export CC_IS_CLANG=1
+	fi
 
 	local d
 
@@ -177,7 +186,7 @@ multilib_src_compile() {
 		CPPFLAGS="${myCPPFLAGS}" \
 		XCFLAGS="${CFLAGS} ${CPPFLAGS}" \
 		NSPR_LIB_DIR="${T}/fakedir" \
-		emake -j1 "${makeargs[@]}" -C ${d}
+		emake -j1 "${makeargs[@]}" -C ${d} OS_TEST="$(nssarch)"
 	done
 }
 
