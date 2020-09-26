@@ -28,7 +28,7 @@ if [[ ${MOZ_ESR} == 1 ]] ; then
 fi
 
 # Patch version
-PATCH="${PN}-81.0-patches-02"
+PATCH="${PN}-82.0-patches-02"
 
 MOZ_HTTP_URI="https://archive.mozilla.org/pub/${PN}/releases"
 MOZ_SRC_URI="${MOZ_HTTP_URI}/${MOZ_PV}/source/${PN}-${MOZ_PV}.source.tar.xz"
@@ -69,7 +69,7 @@ SRC_URI="${SRC_URI}
 	${PATCH_URIS[@]}"
 
 CDEPEND="
-	>=dev-libs/nss-3.55
+	>=dev-libs/nss-3.57
 	>=dev-libs/nspr-4.26
 	dev-libs/atk
 	dev-libs/expat
