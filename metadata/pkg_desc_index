@@ -3,10 +3,10 @@ acct-group/i2c 0: Group for users with access to I2C
 acct-group/spi 0: Group for users with access to SPI
 dev-libs/jemalloc 5.2.0: Jemalloc is a general-purpose scalable concurrent allocator
 dev-libs/nspr 4.25: Netscape Portable Runtime
-dev-libs/nss 3.53.1: Mozilla's Network Security Services library that implements PKI support
+dev-libs/nss 3.57: Mozilla's Network Security Services library that implements PKI support
 dev-libs/nss-pem 1.0.5: PEM file reader for Network Security Services (NSS)
 dev-qt/qtnetwork 5.14.2-r1: Network abstraction library for the Qt5 framework
 mail-client/thunderbird 68.7.0-r1: Thunderbird Mail Client
 media-tv/kodi 18.8: A free and open source media-player and entertainment hub
 virtual/rust 1.42.0: Virtual for Rust language compiler
-www-client/firefox 81.0_beta9: Firefox Web Browser
+www-client/firefox 82.0_beta3: Firefox Web Browser
