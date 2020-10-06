@@ -257,6 +257,7 @@ src_prepare() {
 	# Apply firefox patchset then apply thunderbird patches
 	rm "${WORKDIR}"/firefox/2013_avoid_noinline_on_GCC_with_skcms.patch || die
 	rm "${WORKDIR}"/firefox/2015_fix_cssparser.patch || die
+	rm "${WORKDIR}"/firefox/2016_rust-1.43_bug1580963.patch || die
 	eapply "${WORKDIR}/firefox"
 	use system-libvpx && eapply "${DISTDIR}/2013_update_libvpx_esr.patch"
 	pushd "${S}"/comm &>/dev/null || die
