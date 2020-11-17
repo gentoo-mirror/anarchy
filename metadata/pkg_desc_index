@@ -8,4 +8,4 @@ dev-libs/nss-pem 1.0.5: PEM file reader for Network Security Services (NSS)
 dev-qt/qtnetwork 5.14.2-r1: Network abstraction library for the Qt5 framework
 mail-client/thunderbird 68.12.0: Thunderbird Mail Client
 virtual/rust 1.42.0: Virtual for Rust language compiler
-www-client/firefox 83.0_beta6: Firefox Web Browser
+www-client/firefox 83.0: Firefox Web Browser
