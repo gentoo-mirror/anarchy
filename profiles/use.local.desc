@@ -12,19 +12,3 @@ dev-qt/qtnetwork:connman - Enable net-misc/connman-based bearer plugin
 dev-qt/qtnetwork:gssapi - Enable support for GSSAPI (virtual/krb5)
 dev-qt/qtnetwork:libproxy - Use net-libs/libproxy for automatic HTTP/SOCKS proxy configuration
 dev-qt/qtnetwork:networkmanager - Enable net-misc/networkmanager-based bearer plugin
-mail-client/thunderbird:bindist - Disable official Firefox branding (icons, name) which are not binary-redistributable according to upstream.
-mail-client/thunderbird:clang - Use Clang compiler instead of GCC
-mail-client/thunderbird:custom-optimization - Build with user-specified compiler optimizations (-Os, -O0, -O1, -O2, -O3) from CFLAGS (unsupported)
-mail-client/thunderbird:eme-free - Disable EME (DRM plugin) cabability at build time
-mail-client/thunderbird:gmp-autoupdate - Allow Gecko Media Plugins (binary blobs) to be automatically downloaded and kept up-to-date in user profiles
-mail-client/thunderbird:lightning - Enable app-global calendar support (note 38.0 and above bundles calendar support when this flag is off)
-mail-client/thunderbird:lto - Enable Link Time Optimization (LTO). Requires Gold linker when using GCC or LDD linker when using Clang
-mail-client/thunderbird:pgo - Add support for profile-guided optimization using gcc-4.5, for faster binaries. This option will double the compile time.
-mail-client/thunderbird:system-av1 - Use the system-wide media-libs/dav1d and media-libs/libaom library instead of bundled.
-mail-client/thunderbird:system-harfbuzz - Use the system-wide media-libs/harfbuzz and media-gfx/graphite2 instead of bundled.
-mail-client/thunderbird:system-icu - Use the system-wide dev-libs/icu instead of bundled.
-mail-client/thunderbird:system-jpeg - Use the system-wide media-libs/libjpeg-turbo instead of bundled.
-mail-client/thunderbird:system-libevent - Use the system-wide dev-libs/libevent instead of bundled.
-mail-client/thunderbird:system-libvpx - Use the system-wide media-libs/libvpx instead of bundled.
-mail-client/thunderbird:system-sqlite - Use the system-wide dev-db/sqlite installation with secure-delete enabled
-mail-client/thunderbird:system-webp - Use the system-wide media-libs/libwebp instead of bundled.
