@@ -6,4 +6,4 @@ dev-libs/nspr 4.25: Netscape Portable Runtime
 dev-libs/nss 3.57: Mozilla's Network Security Services library that implements PKI support
 dev-libs/nss-pem 1.0.5: PEM file reader for Network Security Services (NSS)
 dev-qt/qtnetwork 5.14.2-r1: Network abstraction library for the Qt5 framework
-virtual/rust 1.47.0: Virtual for Rust language compiler
+virtual/rust 1.48.0: Virtual for Rust language compiler
