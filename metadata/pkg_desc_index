@@ -1,4 +1,5 @@
 acct-group/gpio 0: Group for users with access to SPI
 acct-group/i2c 0: Group for users with access to I2C
 acct-group/spi 0: Group for users with access to SPI
+net-wireless/qdmr 0.10.2: GUI application for configuring and programming cheap DMR radios
 virtual/rust 1.48.0: Virtual for Rust language compiler
